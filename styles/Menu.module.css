@@ -1,0 +1,32 @@
+.menu {
+
+}
+
+.menu_unorderd_list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #607D8B;
+  
+}
+
+.menu_list_element {
+  float: left;
+  }
+
+.menu_list_element > a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 1.5em 1.5em;
+  text-decoration: none;
+}
+
+.menu_list_element > a:hover {
+  background-color: #FFC107;
+}
+
+.log_in {
+  float:right
+}
