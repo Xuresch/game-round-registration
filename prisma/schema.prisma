@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  username    String?   // Optional for temporary users
+  email       String    @unique
+  password    String
+  role        String    @default("temporary") // Possible values: temporary, normal, organizer, admin
+  expiryDate  DateTime? // Optional, only for temporary users
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  // Relations
+  OrganizedEvents   Event[]
+  MasteredGameRounds GameRound[]
+  PlayerRegistrations PlayerRegistration[]
+}
+
+model Event {
+  id          Int       @id @default(autoincrement())
+  organizerId Int
+  Organizer   User      @relation(fields: [organizerId], references: [id])
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  timeSlots   String?   // Optional field to store timeslots as JSON string
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  // Relations
+  GameRounds   GameRound[]
+}
+
+model GameRound {
+  id              Int       @id @default(autoincrement())
+  eventId         Int?
+  Event           Event?    @relation(fields: [eventId], references: [id])
+  gameMasterId    Int
+  GameMaster      User      @relation(fields: [gameMasterId], references: [id])
+  name            String
+  description     String?
+  gameType        String    // Roleplay, tabletop, boardgame
+  gameSystem      String?   // Only if gameType is 'roleplay'
+  genre           String?
+  recommendedAge  Int?
+  startTime       DateTime
+  endTime         DateTime
+  playerLimit     Int
+  waitingList     Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  extraDetails    String?   // A JSON field for additional info
+  // Relations
+  PlayerRegistrations PlayerRegistration[]
+}
+
+model PlayerRegistration {
+  id          Int       @id @default(autoincrement())
+  playerId    Int
+  Player      User      @relation(fields: [playerId], references: [id])
+  gameRoundId Int
+  GameRound   GameRound @relation(fields: [gameRoundId], references: [id])
+  status      String    // Either 'registered' or 'waiting'
+  joinedAt    DateTime  @default(now())
+}
