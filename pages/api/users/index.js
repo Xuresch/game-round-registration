@@ -9,7 +9,7 @@ const schema = Joi.object({
   role: Joi.string().valid('temporary', 'normal', 'organizer', 'admin').required()
 })
 
-export default async function handler(req, res) {
+export default async function usersHandler(req, res) {
   if (req.method === 'GET') {
     const users = await prisma.user.findMany()
     res.json(users)

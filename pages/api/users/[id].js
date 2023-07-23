@@ -9,7 +9,7 @@ const schema = Joi.object({
   role: Joi.string().valid('temporary', 'normal', 'organizer', 'admin')
 })
 
-export default async function handler(req, res) {
+export default async function userHandler(req, res) {
   const userId = req.query.id
 
   if (req.method === 'GET') {
