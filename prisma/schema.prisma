@@ -26,7 +26,7 @@ model User {
 }
 
 model Event {
-  id          Int       @id @default(autoincrement())
+  id          String    @id @default(uuid())
   organizerId Int
   Organizer   User      @relation(fields: [organizerId], references: [id])
   name        String
@@ -41,8 +41,8 @@ model Event {
 }
 
 model GameRound {
-  id              Int       @id @default(autoincrement())
-  eventId         Int?
+  id              String       @id @default(uuid())
+  eventId         String?
   Event           Event?    @relation(fields: [eventId], references: [id])
   gameMasterId    Int
   GameMaster      User      @relation(fields: [gameMasterId], references: [id])
@@ -67,7 +67,7 @@ model PlayerRegistration {
   id          Int       @id @default(autoincrement())
   playerId    Int
   Player      User      @relation(fields: [playerId], references: [id])
-  gameRoundId Int
+  gameRoundId String
   GameRound   GameRound @relation(fields: [gameRoundId], references: [id])
   status      String    // Either 'registered' or 'waiting'
   joinedAt    DateTime  @default(now())
