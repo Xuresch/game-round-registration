@@ -3,7 +3,7 @@ import Joi from "joi";
 
 const schema = Joi.object({
     eventId: Joi.string(),
-    gameMasterId: Joi.string(),
+    gameMasterId: Joi.number(),
     name: Joi.string(),
     description: Joi.string(),
     gameType: Joi.string(),
@@ -14,7 +14,7 @@ const schema = Joi.object({
     endTime: Joi.string().isoDate(),
     playerLimit: Joi.number().integer(),
     waitingList: Joi.boolean(),
-    extraDetails: Joi.object()
+    extraDetails: Joi.string()
   });
 
 export default async function gameRoundHandler(req, res) {

@@ -3,18 +3,18 @@ import Joi from "joi";
 
 const schema = Joi.object({
     eventId: Joi.string().allow(null),
-    gameMasterId: Joi.string().required(),
+    gameMasterId: Joi.number().required(),
     name: Joi.string().required(),
     description: Joi.string().required(),
     gameType: Joi.string().required(),
     gameSystem: Joi.string().allow(null),
     genre: Joi.string().required(),
-    recommendedAge: Joi.number().integer().required(),
+    recommendedAge: Joi.number().integer(),
     startTime: Joi.string().isoDate().required(),
     endTime: Joi.string().isoDate().required(),
     playerLimit: Joi.number().integer().required(),
     waitingList: Joi.boolean().required(),
-    extraDetails: Joi.object().allow(null)
+    // extraDetails: Joi.object().allow(null)
   });
 
 export default async function gameRoundsHandler(req, res) {
