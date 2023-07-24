@@ -7,12 +7,28 @@ const schema = Joi.object({
   startDate: Joi.string().isoDate().required(),
   endDate: Joi.string().isoDate().required(),
   organizerId: Joi.number().required(),
+  timeSlots: Joi.object().pattern(
+    Joi.string(),
+    Joi.alternatives().try(
+      Joi.string(),
+      Joi.number(),
+      Joi.boolean(),
+      Joi.object()
+    )
+  ),
 });
 
 export default async function eventsHandler(req, res) {
   if (req.method === "GET") {
     const events = await prisma.event.findMany();
-    res.json(events);
+
+    // Parse the timeSlots for each event
+    const parsedEvents = events.map((event) => ({
+      ...event,
+      timeSlots: JSON.parse(event.timeSlots),
+    }));
+
+    res.json(parsedEvents);
   } else if (req.method === "POST") {
     const result = schema.validate(req.body);
     if (result.error) {
@@ -23,6 +39,7 @@ export default async function eventsHandler(req, res) {
     const newEvent = await prisma.event.create({
       data: {
         ...req.body,
+        timeSlots: JSON.stringify(req.body.timeSlots),
       },
     });
 

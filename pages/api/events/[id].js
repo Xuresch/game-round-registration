@@ -7,6 +7,15 @@ const schema = Joi.object({
   startDate: Joi.string().isoDate(),
   endDate: Joi.string().isoDate(),
   organizerId: Joi.number(),
+  timeSlots: Joi.object().pattern(
+    Joi.string(),
+    Joi.alternatives().try(
+      Joi.string(),
+      Joi.number(),
+      Joi.boolean(),
+      Joi.object()
+    )
+  ),
 });
 
 export default async function eventHandler(req, res) {
@@ -16,6 +25,7 @@ export default async function eventHandler(req, res) {
     const event = await prisma.event.findUnique({
       where: { id: eventId },
     });
+    event.timeSlots = JSON.parse(event.timeSlots);
     if (!event) res.status(404).json({ message: "event not found" });
     else res.json(event);
   } else if (req.method === "PUT") {
@@ -25,11 +35,12 @@ export default async function eventHandler(req, res) {
       return;
     }
 
-    let data = { ...req.body };
-
     const updatedevent = await prisma.event.update({
       where: { id: eventId },
-      data,
+      data: {
+        ...req.body,
+        timeSlots: JSON.stringify(req.body.timeSlots),
+      },
     });
 
     res.json(updatedevent);
