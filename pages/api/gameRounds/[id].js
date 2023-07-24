@@ -2,20 +2,28 @@ import prisma from "@/lib/prisma";
 import Joi from "joi";
 
 const schema = Joi.object({
-    eventId: Joi.string(),
-    gameMasterId: Joi.number(),
-    name: Joi.string(),
-    description: Joi.string(),
-    gameType: Joi.string(),
-    gameSystem: Joi.string(),
-    genre: Joi.string(),
-    recommendedAge: Joi.number().integer(),
-    startTime: Joi.string().isoDate(),
-    endTime: Joi.string().isoDate(),
-    playerLimit: Joi.number().integer(),
-    waitingList: Joi.boolean(),
-    extraDetails: Joi.string()
-  });
+  eventId: Joi.string(),
+  gameMasterId: Joi.number(),
+  name: Joi.string(),
+  description: Joi.string(),
+  gameType: Joi.string(),
+  gameSystem: Joi.string(),
+  genre: Joi.string(),
+  recommendedAge: Joi.number().integer(),
+  startTime: Joi.string().isoDate(),
+  endTime: Joi.string().isoDate(),
+  playerLimit: Joi.number().integer(),
+  waitingList: Joi.boolean(),
+  extraDetails: Joi.object().pattern(
+    Joi.string(),
+    Joi.alternatives().try(
+      Joi.string(),
+      Joi.number(),
+      Joi.boolean(),
+      Joi.object()
+    )
+  ),
+});
 
 export default async function gameRoundHandler(req, res) {
   const gameRoundId = req.query.id;
@@ -24,6 +32,7 @@ export default async function gameRoundHandler(req, res) {
     const gameRound = await prisma.gameRound.findUnique({
       where: { id: gameRoundId },
     });
+    gameRound.extraDetails = JSON.parse(gameRound.extraDetails);
     if (!gameRound) res.status(404).json({ message: "Game round not found" });
     else res.json(gameRound);
   } else if (req.method === "PUT") {
@@ -35,7 +44,10 @@ export default async function gameRoundHandler(req, res) {
 
     const updatedGameRound = await prisma.gameRound.update({
       where: { id: gameRoundId },
-      data: { ...req.body },
+      data: {
+        ...req.body,
+        extraDetails: JSON.stringify(req.body.extraDetails),
+      },
     });
 
     res.json(updatedGameRound);

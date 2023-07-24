@@ -14,13 +14,28 @@ const schema = Joi.object({
     endTime: Joi.string().isoDate().required(),
     playerLimit: Joi.number().integer().required(),
     waitingList: Joi.boolean().required(),
-    // extraDetails: Joi.object().allow(null)
+    extraDetails: Joi.object().pattern(
+      Joi.string(),
+      Joi.alternatives().try(
+        Joi.string(),
+        Joi.number(),
+        Joi.boolean(),
+        Joi.object()
+      )
+    ),
   });
 
 export default async function gameRoundsHandler(req, res) {
   if (req.method === "GET") {
     const gameRounds = await prisma.gameRound.findMany();
-    res.json(gameRounds);
+
+    // Parse the extraDetails for each gameRound
+    const parsedGameRounds = gameRounds.map((gameRound) => ({
+      ...gameRound,
+      extraDetails: JSON.parse(gameRound.extraDetails),
+    }));
+
+    res.json(parsedGameRounds);
   } else if (req.method === "POST") {
     const result = schema.validate(req.body);
     if (result.error) {
@@ -31,6 +46,7 @@ export default async function gameRoundsHandler(req, res) {
     const newGameRound = await prisma.gameRound.create({
       data: {
         ...req.body,
+        extraDetails: JSON.stringify(req.body.extraDetails),
       },
     });
 
