@@ -30,9 +30,10 @@ export default async function eventsHandler(req, res) {
 
     res.json(parsedEvents);
   } else if (req.method === "POST") {
-    const result = schema.validate(req.body);
-    if (result.error) {
-      res.status(400).json({ message: result.error.details[0].message });
+    try {
+      validate(schema, req.body);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
       return;
     }
 

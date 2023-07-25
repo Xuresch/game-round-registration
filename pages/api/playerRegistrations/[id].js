@@ -20,10 +20,10 @@ export default async function playerRegistrationHandler(req, res) {
       res.status(404).json({ message: "Player Registration not found" });
     else res.json(playerRegistration);
   } else if (req.method === "PUT") {
-    const { error } = schema.validate(req.body);
-
-    if (error) {
-      res.status(400).json({ message: error.details[0].message });
+    try {
+      validate(schema, req.body);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
       return;
     }
 

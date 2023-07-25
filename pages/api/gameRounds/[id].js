@@ -36,9 +36,10 @@ export default async function gameRoundHandler(req, res) {
     if (!gameRound) res.status(404).json({ message: "Game round not found" });
     else res.json(gameRound);
   } else if (req.method === "PUT") {
-    const result = schema.validate(req.body);
-    if (result.error) {
-      res.status(400).json({ message: result.error.details[0].message });
+    try {
+      validate(schema, req.body);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
       return;
     }
 

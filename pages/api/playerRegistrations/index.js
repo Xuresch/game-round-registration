@@ -13,10 +13,10 @@ export default async function playerRegistrationsHandler(req, res) {
     const playerRegistrations = await prisma.playerRegistration.findMany();
     res.json(playerRegistrations);
   } else if (req.method === "POST") {
-    const { error } = schema.validate(req.body);
-
-    if (error) {
-      res.status(400).json({ message: error.details[0].message });
+    try {
+      validate(schema, req.body);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
       return;
     }
 

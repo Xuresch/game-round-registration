@@ -29,9 +29,10 @@ export default async function eventHandler(req, res) {
     if (!event) res.status(404).json({ message: "event not found" });
     else res.json(event);
   } else if (req.method === "PUT") {
-    const result = schema.validate(req.body);
-    if (result.error) {
-      res.status(400).json({ message: result.error.details[0].message });
+    try {
+      validate(schema, req.body);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
       return;
     }
 
