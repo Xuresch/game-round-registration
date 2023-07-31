@@ -5,7 +5,8 @@ const Menu = () => {
 
     const sites = [
         { id: "1", path: "/", lable: "Startseite"},
-        { id: "2", path: "/rounds", lable: "Spielrunden" },
+        { id: "2", path: "/events", lable: "Veranstaltungen" },
+        { id: "3", path: "/rounds", lable: "Spielrunden" },
     ];
 
 
