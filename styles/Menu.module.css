@@ -21,10 +21,12 @@
   text-align: center;
   padding: 1.5em 1.5em;
   text-decoration: none;
+  color: #FFC107;
 }
 
 .menu_list_element > a:hover {
   background-color: #FFC107;
+  color: #607D8B;
 }
 
 .log_in {
