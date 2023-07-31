@@ -1,11 +1,11 @@
 import styles from '@/styles/Home.module.css'
 
-function Home() {
+function HomePage() {
   return (
-    <>
-      <h1>Hello World!</h1>
-    </>
+    <div>
+      <p>Home Page</p>
+    </div>
   )
 }
 
-export default Home;
+export default HomePage
