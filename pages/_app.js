@@ -2,7 +2,7 @@ import Menu from '@/components/menu';
 
 import '@/styles/globals.css'
 
-export default function App({ Component, pageProps }) {
+function App({ Component, pageProps }) {
   return  (
     <>
       <Menu />
@@ -12,3 +12,5 @@ export default function App({ Component, pageProps }) {
     </>
   )
 }
+
+export default App
