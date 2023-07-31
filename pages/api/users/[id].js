@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import Joi from "joi";
 import bcrypt from "bcryptjs";
 
+import { validate } from "@/helpers/validate";
+
 const schema = Joi.object({
   username: Joi.string(),
   email: Joi.string().email(),

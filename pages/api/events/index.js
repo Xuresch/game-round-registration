@@ -1,6 +1,8 @@
 import prisma from "@/lib/prisma";
 import Joi from "joi";
 
+import { validate } from "@/helpers/validate";
+
 const schema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().required(),
@@ -20,7 +22,11 @@ const schema = Joi.object({
 
 export default async function eventsHandler(req, res) {
   if (req.method === "GET") {
-    const events = await prisma.event.findMany();
+    const events = await prisma.event.findMany({
+      orderBy: {
+        startDate: "asc", // Sort events by startDate
+      },
+    });
 
     // Parse the timeSlots for each event
     const parsedEvents = events.map((event) => ({
