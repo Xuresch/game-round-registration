@@ -29,8 +29,17 @@ const schema = Joi.object({
 
 export default async function gameRoundsHandler(req, res) {
   if (req.method === "GET") {
-    const gameRounds = await prisma.gameRound.findMany();
+    const eventId = req.query.eventId;
 
+    let gameRounds;
+
+    if (eventId) {
+      gameRounds = await prisma.gameRound.findMany({
+        where: { eventId: eventId }, // Filter game rounds by eventId
+      });
+    } else {
+      gameRounds = await prisma.gameRound.findMany();
+    }
     // Parse the extraDetails for each gameRound
     const parsedGameRounds = gameRounds.map((gameRound) => ({
       ...gameRound,
