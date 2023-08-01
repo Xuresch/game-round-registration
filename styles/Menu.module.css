@@ -1,5 +1,8 @@
 .menu {
-
+  position: fixed;
+  top: 0;
+  z-index: 1;
+  width: 100%;
 }
 
 .menu_unorderd_list {
@@ -7,13 +10,13 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #607D8B;
-  
+  background-color: #607d8b;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
 }
 
 .menu_list_element {
   float: left;
-  }
+}
 
 .menu_list_element > a {
   display: block;
@@ -21,14 +24,14 @@
   text-align: center;
   padding: 1.5em 1.5em;
   text-decoration: none;
-  color: #FFC107;
+  color: #ffc107;
 }
 
 .menu_list_element > a:hover {
-  background-color: #FFC107;
-  color: #607D8B;
+  background-color: #ffc107;
+  color: #607d8b;
 }
 
 .log_in {
-  float:right
+  float: right;
 }
