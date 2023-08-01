@@ -4,7 +4,7 @@ function DeteilRoundPage() {
     const router = useRouter();
 
     console.log(router.pathname);
-    console.log(router.query);
+    console.log(router.query.roundid);
 
     return (
       <>
