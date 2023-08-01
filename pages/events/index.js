@@ -1,5 +1,5 @@
 import styles from "@/styles/Events.module.css";
-import EventCard from "@/components/events/eventCard";
+import EventsCard from "@/components/events/eventsCard";
 
 import axios from "axios";
 
@@ -17,7 +17,7 @@ function EventsPage({ events }) {
   return (
     <div className={styles.eventsContainer}>
       {events.map((event) => (
-        <EventCard key={event.id} event={event} />
+        <EventsCard key={event.id} event={event} />
       ))}
     </div>
   );
