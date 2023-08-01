@@ -51,9 +51,9 @@
 }
 
 .links {
-    position: absolute; /* positioning links */
-    bottom: 2em; /* positioning links */
-    left: 0; /* positioning links */
-    right: 0; /* positioning links */
-    text-align: center; /* centering links */
+  position: absolute; /* positioning links */
+  bottom: 2em; /* positioning links */
+  left: 0; /* positioning links */
+  right: 0; /* positioning links */
+  text-align: center; /* centering links */
 }
