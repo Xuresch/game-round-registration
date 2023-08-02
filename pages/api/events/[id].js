@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
 import Joi from "joi";
-
 import { validate } from "@/helpers/validate";
 
 const schema = Joi.object({
@@ -20,25 +19,27 @@ const schema = Joi.object({
   ),
 });
 
-export default async function eventHandler(req, res) {
+const getEvent = async (req, res) => {
   const eventId = req.query.id;
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+  });
 
-  if (req.method === "GET") {
-    const event = await prisma.event.findUnique({
-      where: { id: eventId },
-    });
-    event.timeSlots = JSON.parse(event.timeSlots);
-    if (!event) res.status(404).json({ message: "event not found" });
-    else res.json(event);
-  } else if (req.method === "PUT") {
-    try {
-      validate(schema, req.body);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-      return;
-    }
+  if (!event) {
+    return res
+      .status(404)
+      .json({ message: `Event with the uuid ${eventId} not found!` });
+  }
 
-    const updatedevent = await prisma.event.update({
+  event.timeSlots = JSON.parse(event.timeSlots);
+  return res.json(event);
+};
+
+const updateEvent = async (req, res) => {
+  const eventId = req.query.id;
+  try {
+    validate(schema, req.body);
+    const updatedEvent = await prisma.event.update({
       where: { id: eventId },
       data: {
         ...req.body,
@@ -46,13 +47,37 @@ export default async function eventHandler(req, res) {
       },
     });
 
-    res.json(updatedevent);
-  } else if (req.method === "DELETE") {
-    const deletedevent = await prisma.event.delete({
-      where: { id: eventId },
-    });
-    res.json(deletedevent);
-  } else {
-    res.status(405).json({ message: "Method Not Allowed" });
+    return res.json(updatedEvent);
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+const deleteEvent = async (req, res) => {
+  const eventId = req.query.id;
+  const deletedEvent = await prisma.event.delete({
+    where: { id: eventId },
+  });
+
+  return res.json(deletedEvent);
+};
+
+const methodNotAllowed = (req, res) => {
+  return res.status(405).json({ message: "Method Not Allowed!" });
+};
+
+const handlers = {
+  GET: getEvent,
+  PUT: updateEvent,
+  DELETE: deleteEvent,
+};
+
+export default async function eventHandler(req, res) {
+  const handler = handlers[req.method] || methodNotAllowed;
+  try {
+    await handler(req, res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error!" });
   }
 }
