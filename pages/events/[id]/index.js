@@ -45,7 +45,9 @@ function EventPage({ eventId }) {
   }
 
   if (eventError) {
-    return <Error message={eventError.message} title="event" />;
+    console.log(eventError.response.data);
+    const eventErrorMessage = `${eventError.message}: ${eventError.response.data.message}`;
+    return <Error message={eventErrorMessage} title="event" />;
   }
 
   if (roundsError) {
