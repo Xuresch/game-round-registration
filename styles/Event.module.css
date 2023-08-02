@@ -45,31 +45,15 @@
   grid-column: 2;
 }
 
-.rounds {
-
-}
-
-.rounds_title {
+.roundsTitle {
   font-size: 1.5em;
   color: rgba(0, 0, 0, 0.87);
   text-align: center; /* center the title */
   margin-bottom: 1em;
 }
 
-.rounds_contaioner {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.round_card {
-    border: 1px solid #ccc;
-    position: relative; /* this line is important */
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
-    margin: 0.5em;
-    padding: 1em;
-    width: 40%;
-    /* width: 100%; */
+.roundsContaioner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }

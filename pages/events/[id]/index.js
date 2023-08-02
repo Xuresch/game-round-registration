@@ -2,29 +2,55 @@ import styles from "@/styles/Event.module.css";
 
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
-import axios from "axios";
-import { ro } from "date-fns/locale";
 
-export async function getServerSideProps(context) {
-  const eventId = context.params.id;
+import GameRound from "@/components/rounds/roundsCard";
 
-  const event_res = await axios.get(
-    `http://localhost:3000/api/events/${eventId}`
+import { useFetch } from "@/hooks/useFetch";
+
+function Loading() {
+  return (
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Loading...</h2>
+      </div>
+    </div>
   );
-  const event = event_res.data;
-
-  const round_res = await axios.get(
-    `http://localhost:3000/api/gameRounds?eventId=${eventId}`
-  );
-  const rounds = round_res.data;
-
-  return {
-    props: { event, rounds },
-  };
 }
 
-function EventPage({ event, rounds }) {
-  // console.log(event);
+function Error({ title, message }) {
+  return (
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Error loading {title}</h2>
+        <p className={styles.text}>{message}</p>
+      </div>
+    </div>
+  );
+}
+
+function EventPage({ eventId }) {
+  const {
+    data: event,
+    loading: eventLoading,
+    error: eventError,
+  } = useFetch(`http://localhost:3000/api/events/${eventId}`);
+  const {
+    data: rounds,
+    loading: roundsLoading,
+    error: roundsError,
+  } = useFetch(`http://localhost:3000/api/gameRounds?eventId=${eventId}`);
+
+  if (eventLoading || roundsLoading) {
+    return <Loading />;
+  }
+
+  if (eventError) {
+    return <Error message={eventError.message} title="event" />;
+  }
+
+  if (roundsError) {
+    return <Error message={roundsError.message} title="rounds" />;
+  }
 
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -38,36 +64,6 @@ function EventPage({ event, rounds }) {
   const displayEndDate = isSameDay
     ? format(endDate, "HH:mm")
     : formattedEndDate;
-
-  if (rounds.length > 0) {
-    rounds = (
-      <div className={styles.rounds}>
-        <h3 className={styles.rounds_title}>Spielrunden</h3>
-        <div className={styles.rounds_contaioner}>
-          {rounds.map((round) => (
-            <div key={round.id} className={styles.round_card}>
-              <p className={styles.round_name}>Name: {round.name}</p>
-              <p className={styles.round_description}>Beschreibung: {round.description}</p>
-              <p className={styles.round_description}>Start: {format(new Date(round.startTime), "HH:mm")}</p>
-              <p className={styles.round_description}>Ende: {format(new Date(round.endTime), "HH:mm")}</p>
-              <p className={styles.round_description}>Genre: {round.genre}</p>
-              <p className={styles.round_description}>Type: {round.gameType}</p>
-              <p className={styles.round_description}>Maximalspieler: {round.playerLimit}</p>
-              <p className={styles.round_description}>Forgeschalgenes Alter: {round.recommendedAge}</p>
-              <p className={styles.round_description}>Zusätzliche Deteils: {round.extraDetails}</p>
-
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  } else {
-    rounds = (
-      <div className={styles.rounds}>
-        {/* <h3 className={styles.rounds_title}>Spielrunden</h3> */}
-      </div>
-    );
-  }
 
   return (
     <div className={styles.container}>
@@ -89,10 +85,27 @@ function EventPage({ event, rounds }) {
             <p className={styles.text}>{event.description}</p>
           </div>
         </div>
-        {rounds}
+        {rounds.length > 0 ? (
+          <div className={styles.rounds}>
+            <h3 className={styles.roundsTitle}>Spielrunden</h3>
+            <div className={styles.roundsContaioner}>
+              {rounds.map((round) => (
+                <GameRound key={round.id} round={round} />
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );
+}
+
+export async function getServerSideProps(context) {
+  const eventId = context.params.id;
+
+  return {
+    props: { eventId },
+  };
 }
 
 export default EventPage;
