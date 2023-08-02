@@ -8,15 +8,17 @@ const schema = Joi.object({
   startDate: Joi.string().isoDate(),
   endDate: Joi.string().isoDate(),
   organizerId: Joi.number(),
-  timeSlots: Joi.object().pattern(
-    Joi.string(),
-    Joi.alternatives().try(
+  timeSlots: Joi.object()
+    .pattern(
       Joi.string(),
-      Joi.number(),
-      Joi.boolean(),
-      Joi.object()
+      Joi.alternatives().try(
+        Joi.string(),
+        Joi.number(),
+        Joi.boolean(),
+        Joi.object()
+      )
     )
-  ),
+    .allow(null),
 });
 
 const getEvent = async (req, res) => {
@@ -43,12 +45,14 @@ const updateEvent = async (req, res) => {
       where: { id: eventId },
       data: {
         ...req.body,
-        timeSlots: JSON.stringify(req.body.timeSlots),
+        timeSlots: req.body.timeSlots
+          ? JSON.stringify(req.body.timeSlots)
+          : null,
       },
     });
-
     return res.json(updatedEvent);
   } catch (error) {
+    console.error(error);
     return res.status(400).json({ message: error.message });
   }
 };

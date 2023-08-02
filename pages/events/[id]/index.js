@@ -5,7 +5,7 @@ import { utcToZonedTime } from "date-fns-tz";
 
 import GameRound from "@/components/rounds/roundsCard";
 
-import { useFetch } from "@/hooks/useFetch";
+import { useApiRequest } from "@/hooks/useApiRequest";
 
 function Loading() {
   return (
@@ -33,12 +33,12 @@ function EventPage({ eventId }) {
     data: event,
     loading: eventLoading,
     error: eventError,
-  } = useFetch(`http://localhost:3000/api/events/${eventId}`);
+  } = useApiRequest(`http://localhost:3000/api/events/${eventId}`);
   const {
     data: rounds,
     loading: roundsLoading,
     error: roundsError,
-  } = useFetch(`http://localhost:3000/api/gameRounds?eventId=${eventId}`);
+  } = useApiRequest(`http://localhost:3000/api/gameRounds?eventId=${eventId}`);
 
   if (eventLoading || roundsLoading) {
     return <Loading />;
