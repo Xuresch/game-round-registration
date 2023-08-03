@@ -1,10 +1,12 @@
-import styles from "@/styles/Event.module.css";
-
+import React from "react";
+import { useRouter } from "next/router";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
+import styles from "@/styles/Event.module.css";
 import GameRound from "@/components/rounds/roundsCard";
-
 import { useApiRequest } from "@/hooks/useApiRequest";
 
 function Loading() {
@@ -29,6 +31,7 @@ function Error({ title, message }) {
 }
 
 function EventPage({ eventId }) {
+  const router = useRouter();
   const {
     data: event,
     loading: eventLoading,
@@ -39,6 +42,34 @@ function EventPage({ eventId }) {
     loading: roundsLoading,
     error: roundsError,
   } = useApiRequest(`http://localhost:3000/api/gameRounds?eventId=${eventId}`);
+  const {
+    fetchData: deleteEvent,
+    data: deleteEventData,
+    loading: deleteEventLoading,
+    error: deleteEventError,
+  } = useApiRequest(
+    `http://localhost:3000/api/events/${eventId}`,
+    "DELETE",
+    false
+  );
+
+  const handleDelete = async () => {
+    try {
+      await deleteEvent();
+    } catch (err) {
+      console.error("Failed to delete event:", err);
+    }
+  };
+
+  const handleUpdate = () => {
+    router.push(`http://localhost:3000/events/${eventId}/update`);
+  };
+
+  React.useEffect(() => {
+    if (!deleteEventLoading && !deleteEventError && deleteEventData) {
+      router.push(`http://localhost:3000/events`);
+    }
+  }, [deleteEventLoading, deleteEventError, deleteEventData]);
 
   if (eventLoading || roundsLoading) {
     return <Loading />;
@@ -70,7 +101,23 @@ function EventPage({ eventId }) {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h2 className={styles.title}>{event.name}</h2>
+        <div className={styles.header}>
+          <h2 className={styles.title}>{event.name}</h2>
+          <div className={styles.links}>
+            <button
+              onClick={handleUpdate}
+              className={`${styles.button} ${styles.edit}`}
+            >
+              <FontAwesomeIcon icon={faPenToSquare} size="lg" />
+            </button>
+            <button
+              onClick={handleDelete}
+              className={`${styles.button} ${styles.delete}`}
+            >
+              <FontAwesomeIcon icon={faTrashCan} size="lg" />
+            </button>
+          </div>
+        </div>
         <div className={styles.content}>
           <div className={styles.informations}>
             <p className={styles.text}>

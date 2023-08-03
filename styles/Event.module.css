@@ -57,3 +57,43 @@
   flex-wrap: wrap;
   justify-content: center;
 }
+
+.header {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.button {
+  background-color: #fff;
+  color: #607d8b;
+  text-decoration: none;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+  padding: 10px 16px;
+  border: 0px solid #607d8b;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  height: 42px;
+}
+
+.button:hover {
+  background-color: #ffc107;
+  color: #607d8b;
+}
+
+.links {
+  position: absolute; /* positioning links */
+  top: 1em; /* positioning links */
+  right: 1em; /* positioning links */
+  text-align: center; /* centering links */
+}
+
+.delete:hover {
+  background-color: #f44336;
+}
+
+.edit:hover {
+  background-color: #8BC34A;
+}
