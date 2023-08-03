@@ -52,6 +52,10 @@ function EventCard({ event }) {
     }
   };
 
+  const handleUpdate = () => {
+    router.push(`http://localhost:3000/events/${event.id}/update`);
+  };
+
   React.useEffect(() => {
     if (!deleteEventLoading && !deleteEventError && deleteEventData) {
       router.push(`http://localhost:3000/events`);
@@ -74,12 +78,12 @@ function EventCard({ event }) {
         {trimText(event.description, 300)}
       </p>
       <div className={styles.links}>
-        <Link
-          href={`/events/${event.id}/update`}
+        <button
+          onClick={handleUpdate}
           className={`${styles.button} ${styles.edit}`}
         >
-          <FontAwesomeIcon icon={faPenToSquare} />
-        </Link>
+          <FontAwesomeIcon icon={faPenToSquare} size="lg" />
+        </button>
         <Link href={`/events/${event.id}`} className={styles.button}>
           mehr erfahren
         </Link>

@@ -35,15 +35,17 @@
 }
 
 .button {
+  background-color: #fff;
   color: #607d8b;
   text-decoration: none;
   margin-right: 0.5em;
   margin-left: 0.5em;
   padding: 10px 16px;
-  border: 2px solid #607d8b;
+  border: 0px solid #607d8b;
   border-radius: 4px;
   font-weight: bold;
   transition: all 0.2s ease-in-out;
+  height: 42px;
 }
 
 .button:hover {
@@ -57,11 +59,6 @@
   left: 0; /* positioning links */
   right: 0; /* positioning links */
   text-align: center; /* centering links */
-}
-
-.delete {
-  height: 43px;
-  width: 52px;
 }
 
 .delete:hover {
