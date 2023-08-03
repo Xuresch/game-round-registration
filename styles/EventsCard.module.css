@@ -34,10 +34,11 @@
   -webkit-box-orient: vertical;
 }
 
-.readMore {
+.button {
   color: #607d8b;
   text-decoration: none;
-  margin-top: 16px;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
   padding: 10px 16px;
   border: 2px solid #607d8b;
   border-radius: 4px;
@@ -45,7 +46,7 @@
   transition: all 0.2s ease-in-out;
 }
 
-.readMore:hover {
+.button:hover {
   background-color: #ffc107;
   color: #607d8b;
 }
@@ -56,4 +57,17 @@
   left: 0; /* positioning links */
   right: 0; /* positioning links */
   text-align: center; /* centering links */
+}
+
+.delete {
+  height: 43px;
+  width: 52px;
+}
+
+.delete:hover {
+  background-color: #f44336;
+}
+
+.edit:hover {
+  background-color: #8BC34A;
 }

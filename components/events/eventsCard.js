@@ -3,8 +3,14 @@ import styles from "@/styles/EventsCard.module.css";
 import React from "react";
 import Link from "next/link";
 
+import { useRouter } from "next/router";
+
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+
+import { useApiRequest } from "@/hooks/useApiRequest";
 
 function trimText(text, lengthLimit) {
   return text.length > lengthLimit
@@ -13,6 +19,7 @@ function trimText(text, lengthLimit) {
 }
 
 function EventCard({ event }) {
+  const router = useRouter();
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const startDate = utcToZonedTime(new Date(event.startDate), userTimeZone);
@@ -25,6 +32,31 @@ function EventCard({ event }) {
   const displayEndDate = isSameDay
     ? format(endDate, "HH:mm")
     : formattedEndDate;
+
+  const {
+    fetchData: deleteEvent,
+    data: deleteEventData,
+    loading: deleteEventLoading,
+    error: deleteEventError,
+  } = useApiRequest(
+    `http://localhost:3000/api/events/${event.id}`,
+    "DELETE",
+    false
+  );
+
+  const handleDelete = async () => {
+    try {
+      await deleteEvent();
+    } catch (err) {
+      console.error("Failed to delete event:", error);
+    }
+  };
+
+  React.useEffect(() => {
+    if (!deleteEventLoading && !deleteEventError && deleteEventData) {
+      router.push(`http://localhost:3000/events`);
+    }
+  }, [deleteEventLoading, deleteEventError, deleteEventData]);
 
   return (
     <div className={styles.card}>
@@ -42,12 +74,21 @@ function EventCard({ event }) {
         {trimText(event.description, 300)}
       </p>
       <div className={styles.links}>
-        <Link href={`/events/${event.id}`} className={styles.readMore}>
+        <Link
+          href={`/events/${event.id}/update`}
+          className={`${styles.button} ${styles.edit}`}
+        >
+          <FontAwesomeIcon icon={faPenToSquare} />
+        </Link>
+        <Link href={`/events/${event.id}`} className={styles.button}>
           mehr erfahren
         </Link>
-        {/* <Link href={`/event/${event.id}`} className={styles.readMore}>
-          Update
-        </Link> */}
+        <button
+          onClick={handleDelete}
+          className={`${styles.button} ${styles.delete}`}
+        >
+          <FontAwesomeIcon icon={faTrashCan} size="lg" />
+        </button>
       </div>
     </div>
   );
