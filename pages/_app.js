@@ -1,16 +1,16 @@
-import Menu from '@/components/menu';
+import Menu from "@/components/menu";
 
-import '@/styles/globals.css'
+import "@/styles/globals.css";
 
 function App({ Component, pageProps }) {
-  return  (
+  return (
     <>
       <Menu />
-      <div className='conntent'>
+      <div className="conntent">
         <Component {...pageProps} />
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

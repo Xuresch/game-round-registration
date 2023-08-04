@@ -30,7 +30,12 @@ function UpdateEventPage({ eventId }) {
     data: updatedEventData,
     loading: updateEventLoading,
     error: updateEventError,
-  } = useApiRequest(`${env.BASE_API_URL}/events/${eventId}`, "PUT", null, false);
+  } = useApiRequest(
+    `${env.BASE_API_URL}/events/${eventId}`,
+    "PUT",
+    null,
+    false
+  );
 
   const {
     control,

@@ -48,11 +48,7 @@ function EventPage({ eventId }) {
     data: deleteEventData,
     loading: deleteEventLoading,
     error: deleteEventError,
-  } = useApiRequest(
-    `${env.BASE_API_URL}/events/${eventId}`,
-    "DELETE",
-    false
-  );
+  } = useApiRequest(`${env.BASE_API_URL}/events/${eventId}`, "DELETE", false);
 
   const handleDelete = async () => {
     try {
