@@ -3,8 +3,10 @@ import EventsCard from "@/components/events/eventsCard";
 
 import axios from "axios";
 
+import { env } from "@/helpers/env";
+
 export async function getServerSideProps() {
-  const res = await axios.get("http://localhost:3000/api/events/");
+  const res = await axios.get(`${env.BASE_API_URL}/events/`);
   const events = res.data;
 
   return {

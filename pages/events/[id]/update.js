@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import { useRouter } from "next/router";
 import { da } from "date-fns/locale";
+import { env } from "@/helpers/env";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -22,14 +23,14 @@ function UpdateEventPage({ eventId }) {
     data: event,
     loading: eventLoading,
     error: eventError,
-  } = useApiRequest(`http://localhost:3000/api/events/${eventId}`);
+  } = useApiRequest(`${env.BASE_API_URL}/events/${eventId}`);
 
   const {
     fetchData: updateEvent,
     data: updatedEventData,
     loading: updateEventLoading,
     error: updateEventError,
-  } = useApiRequest(`http://localhost:3000/api/events/${eventId}`, "PUT", null, false);
+  } = useApiRequest(`${env.BASE_API_URL}/events/${eventId}`, "PUT", null, false);
 
   const {
     control,
@@ -67,7 +68,7 @@ function UpdateEventPage({ eventId }) {
   // handle response from the PUT request
   React.useEffect(() => {
     if (!updateEventLoading && !updateEventError && updatedEventData) {
-      router.push(`http://localhost:3000/events/${eventId}`);
+      router.push(`${env.BASE_URL}/events/${eventId}`);
     }
   }, [updateEventLoading, updateEventError, updatedEventData]);
 

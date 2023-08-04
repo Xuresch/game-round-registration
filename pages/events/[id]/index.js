@@ -8,6 +8,7 @@ import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import styles from "@/styles/Event.module.css";
 import GameRound from "@/components/rounds/roundsCard";
 import { useApiRequest } from "@/hooks/useApiRequest";
+import { env } from "@/helpers/env";
 
 function Loading() {
   return (
@@ -36,19 +37,19 @@ function EventPage({ eventId }) {
     data: event,
     loading: eventLoading,
     error: eventError,
-  } = useApiRequest(`http://localhost:3000/api/events/${eventId}`);
+  } = useApiRequest(`${env.BASE_API_URL}/events/${eventId}`);
   const {
     data: rounds,
     loading: roundsLoading,
     error: roundsError,
-  } = useApiRequest(`http://localhost:3000/api/gameRounds?eventId=${eventId}`);
+  } = useApiRequest(`${env.BASE_API_URL}/gameRounds?eventId=${eventId}`);
   const {
     fetchData: deleteEvent,
     data: deleteEventData,
     loading: deleteEventLoading,
     error: deleteEventError,
   } = useApiRequest(
-    `http://localhost:3000/api/events/${eventId}`,
+    `${env.BASE_API_URL}/events/${eventId}`,
     "DELETE",
     false
   );
@@ -62,12 +63,12 @@ function EventPage({ eventId }) {
   };
 
   const handleUpdate = () => {
-    router.push(`http://localhost:3000/events/${eventId}/update`);
+    router.push(`${env.BASE_URL}/events/${eventId}/update`);
   };
 
   React.useEffect(() => {
     if (!deleteEventLoading && !deleteEventError && deleteEventData) {
-      router.push(`http://localhost:3000/events`);
+      router.push(`${env.BASE_URL}/events`);
     }
   }, [deleteEventLoading, deleteEventError, deleteEventData]);
 
