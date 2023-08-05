@@ -48,7 +48,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK - Successful operation",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -150,35 +150,53 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "username": {
-                      "type": "string"
-                    },
-                    "role": {
+                    "code": {
                       "type": "string",
-                      "enum": ["admin", "organisator", "normal", "temporary"],
-                      "default": "temporary"
+                      "default": "UserCreated"
                     },
-                    "expiryDate": {
+                    "message": {
                       "type": "string",
-                      "format": "date-time",
-                      "description": "Date when the user expires",
-                      "example": "yyyy-MM-ddTHH:mm:ssZ",
-                      "default": "null"
+                      "default": "User has been created!"
                     },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "Date when the user has been created",
-                      "example": "yyyy-MM-ddTHH:mm:ssZ"
-                    },
-                    "updatedAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "Date when the user has been updated",
-                      "example": "yyyy-MM-ddTHH:mm:ssZ"
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "admin",
+                            "organisator",
+                            "normal",
+                            "temporary"
+                          ],
+                          "default": "temporary"
+                        },
+                        "expiryDate": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Date when the user expires",
+                          "example": "yyyy-MM-ddTHH:mm:ssZ",
+                          "default": "null"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Date when the user has been created",
+                          "example": "yyyy-MM-ddTHH:mm:ssZ"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Date when the user has been updated",
+                          "example": "yyyy-MM-ddTHH:mm:ssZ"
+                        }
+                      }
                     }
                   }
                 }
@@ -207,6 +225,104 @@
                     "ExistingUser": {
                       "error_code": "ExistingUser",
                       "message": "User already exists"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "Method Not Allowed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/[id]": {
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete a user",
+        "description": "Delete a user with the given ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": false,
+            "description": "ID of the user to delete",
+            "schema": {
+              "type": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "default": "UserDeleted"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "User has been deleted!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "admin",
+                            "organisator",
+                            "normal",
+                            "temporary"
+                          ],
+                          "default": "temporary"
+                        },
+                        "expiryDate": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Date when the user expires",
+                          "example": "yyyy-MM-ddTHH:mm:ssZ",
+                          "default": "null"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Date when the user has been created",
+                          "example": "yyyy-MM-ddTHH:mm:ssZ"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Date when the user has been updated",
+                          "example": "yyyy-MM-ddTHH:mm:ssZ"
+                        }
+                      }
                     }
                   }
                 }
