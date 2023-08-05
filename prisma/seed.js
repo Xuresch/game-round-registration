@@ -93,6 +93,7 @@ async function main() {
         endDate: endDate,
         createdAt: new Date(),
         updatedAt: new Date(),
+        timeSlots: '{"slot_1":{"start":"","end":""}}',
       },
     });
     events.push(event);
