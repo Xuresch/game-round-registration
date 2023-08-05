@@ -16,6 +16,11 @@ const schema = Joi.object({
 export default async function usersHandler(req, res) {
   if (req.method === "GET") {
     const users = await prisma.user.findMany();
+
+    users.forEach((user) => {
+      delete user.password;
+    });
+
     res.json(users);
   } else if (req.method === "POST") {
     if (req.body.username === "") {
@@ -25,7 +30,9 @@ export default async function usersHandler(req, res) {
     try {
       validate(schema, req.body);
     } catch (error) {
-      res.status(400).json({ error_code: "ValidationError", message: error.message });
+      res
+        .status(400)
+        .json({ error_code: "ValidationError", message: error.message });
       return;
     }
 
@@ -36,7 +43,9 @@ export default async function usersHandler(req, res) {
     });
 
     if (existingUserEmail) {
-      res.status(400).json({error_code: "ExistingUser", message: "User already exists" });
+      res
+        .status(400)
+        .json({ error_code: "ExistingUser", message: "User already exists" });
       return;
     }
 
@@ -49,7 +58,13 @@ export default async function usersHandler(req, res) {
       },
     });
 
-    res.json(newUser);
+    delete newUser.password;
+
+    res.json({
+      code: "UserCreated",
+      message: "User has been created!",
+      datan: newUser,
+    });
   } else {
     res.status(405).json({ message: "Method Not Allowed" });
   }

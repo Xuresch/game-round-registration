@@ -3,6 +3,7 @@ import Joi from "joi";
 import bcrypt from "bcryptjs";
 
 import { validate } from "@/helpers/validate";
+import { de } from "date-fns/locale";
 
 const schema = Joi.object({
   username: Joi.string(),
@@ -19,7 +20,13 @@ export default async function userHandler(req, res) {
       where: { id: Number(userId) },
     });
     if (!user) res.status(404).json({ message: "User not found" });
-    else res.json(user);
+    else
+      res.json({
+        code: "GetUser",
+        message: "Get user successfully!",
+        data: user,
+      });
+    res.json(user);
   } else if (req.method === "PUT") {
     try {
       validate(schema, req.body);
@@ -45,7 +52,14 @@ export default async function userHandler(req, res) {
     const deletedUser = await prisma.user.delete({
       where: { id: Number(userId) },
     });
-    res.json(deletedUser);
+
+    delete deletedUser.password;
+
+    res.json({
+      code: "UserDeleted",
+      message: "User has been deleted!",
+      data: deletedUser,
+    });
   } else {
     res.status(405).json({ message: "Method Not Allowed" });
   }
