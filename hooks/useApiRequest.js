@@ -12,6 +12,8 @@ export const useApiRequest = (url, method = "GET", autoFetch = true) => {
       let res;
       if (method === "GET") {
         res = await axios.get(url);
+      } else if (method === "POST") {
+        res = await axios.post(url, body);
       } else if (method === "PUT") {
         res = await axios.put(url, body);
       } else if (method === "DELETE") {
