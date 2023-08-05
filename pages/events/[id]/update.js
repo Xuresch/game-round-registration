@@ -189,7 +189,7 @@ function UpdateEventPage({ eventId }) {
               control={control}
               name="id"
               render={({ field }) => (
-                <input className={styles.input} {...field} readOnly  />
+                <input className={styles.input} {...field} readOnly />
               )}
             />
             {errors.id && (
@@ -330,7 +330,6 @@ function UpdateEventPage({ eventId }) {
                 </label>
               </fieldset>
             ))}
-            <div className={styles.buttonWrapper}></div>
           </label>
           <div className={styles.buttonWrapper}>
             <button className={`${styles.button} ${styles.save}`} type="submit">
