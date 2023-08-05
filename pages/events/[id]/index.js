@@ -9,6 +9,7 @@ import styles from "@/styles/Event.module.css";
 import GameRound from "@/components/rounds/roundsCard";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import { env } from "@/helpers/env";
+import Card from "@/components/shared/card";
 
 function Loading() {
   return (
@@ -96,53 +97,51 @@ function EventPage({ eventId }) {
     : formattedEndDate;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>{event.name}</h2>
-          <div className={styles.links}>
-            <button
-              onClick={handleUpdate}
-              className={`${styles.button} ${styles.edit}`}
-            >
-              <FontAwesomeIcon icon={faPenToSquare} size="lg" />
-            </button>
-            <button
-              onClick={handleDelete}
-              className={`${styles.button} ${styles.delete}`}
-            >
-              <FontAwesomeIcon icon={faTrashCan} size="lg" />
-            </button>
-          </div>
+    <Card>
+      <div className={styles.header}>
+        <h2 className={styles.title}>{event.name}</h2>
+        <div className={styles.links}>
+          <button
+            onClick={handleUpdate}
+            className={`${styles.button} ${styles.edit}`}
+          >
+            <FontAwesomeIcon icon={faPenToSquare} size="lg" />
+          </button>
+          <button
+            onClick={handleDelete}
+            className={`${styles.button} ${styles.delete}`}
+          >
+            <FontAwesomeIcon icon={faTrashCan} size="lg" />
+          </button>
         </div>
-        <div className={styles.content}>
-          <div className={styles.informations}>
-            <p className={styles.text}>
-              <b>Beginn:</b> {formattedStartDate} Uhr
-            </p>
-            <p className={styles.text}>
-              <b>Ende:</b> {displayEndDate} Uhr
-            </p>
-            <p className={styles.text}>
-              <b>Location:</b> Jugendhaus Sillenbuch {event.location}
-            </p>
-          </div>
-          <div className={styles.description}>
-            <p className={styles.text}>{event.description}</p>
-          </div>
-        </div>
-        {rounds.length > 0 ? (
-          <div className={styles.rounds}>
-            <h3 className={styles.roundsTitle}>Spielrunden</h3>
-            <div className={styles.roundsContaioner}>
-              {rounds.map((round) => (
-                <GameRound key={round.id} round={round} />
-              ))}
-            </div>
-          </div>
-        ) : null}
       </div>
-    </div>
+      <div className={styles.content}>
+        <div className={styles.informations}>
+          <p className={styles.text}>
+            <b>Beginn:</b> {formattedStartDate} Uhr
+          </p>
+          <p className={styles.text}>
+            <b>Ende:</b> {displayEndDate} Uhr
+          </p>
+          <p className={styles.text}>
+            <b>Location:</b> Jugendhaus Sillenbuch {event.location}
+          </p>
+        </div>
+        <div className={styles.description}>
+          <p className={styles.text}>{event.description}</p>
+        </div>
+      </div>
+      {rounds.length > 0 ? (
+        <div className={styles.rounds}>
+          <h3 className={styles.roundsTitle}>Spielrunden</h3>
+          <div className={styles.roundsContaioner}>
+            {rounds.map((round) => (
+              <GameRound key={round.id} round={round} />
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </Card>
   );
 }
 
