@@ -25,7 +25,7 @@ export default async function usersHandler(req, res) {
     try {
       validate(schema, req.body);
     } catch (error) {
-      res.status(400).json({ message: error.message });
+      res.status(400).json({ error_code: "ValidationError", message: error.message });
       return;
     }
 
@@ -36,7 +36,7 @@ export default async function usersHandler(req, res) {
     });
 
     if (existingUserEmail) {
-      res.status(400).json({ message: "User already exists" });
+      res.status(400).json({error_code: "ExistingUser", message: "User already exists" });
       return;
     }
 
