@@ -6,6 +6,12 @@ import { useApiRequest } from "@/hooks/useApiRequest";
 import { useRouter } from "next/router";
 import { da } from "date-fns/locale";
 import { env } from "@/helpers/env";
+import Card from "@/components/shared/card";
+import styles from "@/styles/UpdateEvent.module.css";
+import { formatISO } from "date-fns";
+import { utcToZonedTime } from "date-fns-tz";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -38,18 +44,59 @@ function UpdateEventPage({ eventId }) {
   );
 
   const {
+    fetchData: deleteEvent,
+    data: deleteEventData,
+    loading: deleteEventLoading,
+    error: deleteEventError,
+  } = useApiRequest(`${env.BASE_API_URL}/events/${eventId}`, "DELETE", false);
+
+  const {
     control,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      id: "",
+      name: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+      organizerId: "",
+      timeSlots: "",
+    },
   });
+
+  // Function to convert date to user's timezone and format it
+  function formatToUserTimezone(dateStr, timezone) {
+    const date = utcToZonedTime(dateStr, timezone);
+    return (
+      formatISO(date, { representation: "date" }) +
+      "T" +
+      formatISO(date, { representation: "time" }).slice(0, 5)
+    );
+  }
 
   // This effect runs whenever 'event' changes. It resets form values.
   React.useEffect(() => {
     if (event) {
-      reset(event); // Reset form with the fetched data
+      const formattedEvent = { ...event };
+
+      // Get user's timezone
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      // Convert the dates to the user's timezone and format them
+      formattedEvent.startDate = formatToUserTimezone(
+        event.startDate,
+        userTimezone
+      );
+      formattedEvent.endDate = formatToUserTimezone(
+        event.endDate,
+        userTimezone
+      );
+
+      reset(formattedEvent); // Reset form with the fetched data
     }
   }, [event, reset]);
 
@@ -60,7 +107,7 @@ function UpdateEventPage({ eventId }) {
       startDate: data.startDate,
       endDate: data.endDate,
       organizerId: data.organizerId,
-      timeSlots: data.timeSlots ? data.timeSlots : null,
+      timeSlots: data.timeSlots ? JSON.parse(data.timeSlots) : null,
     };
 
     try {
@@ -69,6 +116,25 @@ function UpdateEventPage({ eventId }) {
       console.error(err);
     }
   };
+
+  const handleCancel = async (event) => {
+    event.preventDefault();
+    router.push(`${env.BASE_URL}/events/${eventId}`);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteEvent();
+    } catch (err) {
+      console.error("Failed to delete event:", err);
+    }
+  };
+
+  React.useEffect(() => {
+    if (!deleteEventLoading && !deleteEventError && deleteEventData) {
+      router.push(`${env.BASE_URL}/events`);
+    }
+  }, [deleteEventLoading, deleteEventError, deleteEventData]);
 
   // handle response from the PUT request
   React.useEffect(() => {
@@ -86,24 +152,137 @@ function UpdateEventPage({ eventId }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Controller
-        control={control}
-        name="name"
-        render={({ field }) => <input {...field} />}
-      />
-      {errors.name && <p>Name is required</p>}
+    <Card>
+      <div className={styles.header}>
+        <h2 className={styles.title}>Update Event {event.name}</h2>
+        <div className={styles.links}>
+          <button
+            onClick={handleDelete}
+            className={`${styles.button} ${styles.cancel}`}
+          >
+            <FontAwesomeIcon icon={faTrashCan} size="lg" />
+          </button>
+        </div>
+      </div>
+      <div className={styles.content}>
+        <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+          <label className={styles.label}>
+            ID
+            <Controller
+              control={control}
+              name="id"
+              render={({ field }) => (
+                <input className={styles.input} {...field} />
+              )}
+            />
+            {errors.id && (
+              <p className={styles.error}>This field is required</p>
+            )}
+          </label>
 
-      <Controller
-        control={control}
-        name="description"
-        render={({ field }) => <input {...field} />}
-      />
-      {errors.description && <p>Description is required</p>}
+          <label className={styles.label}>
+            Organizer ID
+            <Controller
+              control={control}
+              name="organizerId"
+              render={({ field }) => (
+                <input className={styles.input} {...field} />
+              )}
+            />
+            {errors.organizerId && (
+              <p className={styles.error}>This field is required</p>
+            )}
+          </label>
 
-      {/* And so on for other fields... */}
-      <button type="submit">Update</button>
-    </form>
+          <label className={styles.label}>
+            Name
+            <Controller
+              control={control}
+              name="name"
+              render={({ field }) => (
+                <input className={styles.input} {...field} />
+              )}
+            />
+            {errors.name && <p className={styles.error}>Name is required</p>}
+          </label>
+
+          <label className={styles.label}>
+            Description
+            <Controller
+              control={control}
+              name="description"
+              render={({ field }) => (
+                <textarea className={styles.input} {...field} />
+              )}
+            />
+            {errors.description && (
+              <p className={styles.error}>Description is required</p>
+            )}
+          </label>
+
+          <label className={styles.label}>
+            Start Date
+            <Controller
+              control={control}
+              name="startDate"
+              render={({ field }) => (
+                <input
+                  className={styles.input}
+                  type="datetime-local"
+                  {...field}
+                />
+              )}
+            />
+            {errors.startDate && (
+              <p className={styles.error}>Start Date is required</p>
+            )}
+          </label>
+
+          <label className={styles.label}>
+            End Date
+            <Controller
+              control={control}
+              name="endDate"
+              render={({ field }) => (
+                <input
+                  className={styles.input}
+                  type="datetime-local"
+                  {...field}
+                />
+              )}
+            />
+            {errors.endDate && (
+              <p className={styles.error}>End Date is required</p>
+            )}
+          </label>
+
+          <label className={styles.label}>
+            Time Slots
+            <Controller
+              control={control}
+              name="timeSlots"
+              render={({ field }) => (
+                <textarea className={styles.input} {...field} />
+              )}
+            />
+            {errors.timeSlots && (
+              <p className={styles.error}>Time Slots is required</p>
+            )}
+          </label>
+          <div className={styles.buttonWrapper}>
+            <button className={`${styles.button} ${styles.save}`} type="submit">
+              Event speichern
+            </button>
+            <button
+              onClick={handleCancel}
+              className={`${styles.button} ${styles.cancel}`}
+            >
+              Abbrechen
+            </button>
+          </div>
+        </form>
+      </div>
+    </Card>
   );
 }
 
