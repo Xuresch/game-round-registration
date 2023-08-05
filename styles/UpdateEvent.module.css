@@ -44,32 +44,32 @@
 }
 
 .buttonWrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 
 .button {
-    background-color: #fff;
-    color: #607d8b;
-    text-decoration: none;
-    margin-right: 0.5em;
-    margin-left: 0.5em;
-    padding: 10px 16px;
-    border: 0px solid #607d8b;
-    border-radius: 4px;
-    font-weight: bold;
-    transition: all 0.2s ease-in-out;
-    height: 42px;
-  }
+  background-color: #fff;
+  color: #607d8b;
+  text-decoration: none;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+  padding: 10px 16px;
+  border: 0px solid #607d8b;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  height: 42px;
+}
 
 .save:hover {
   background-color: #8bc34a;
 }
 
 .cancel:hover {
-    background-color: #f44336;
-  }
+  background-color: #f44336;
+}
 
 .error {
   color: #f44336;
@@ -80,4 +80,20 @@
   top: 1em; /* positioning links */
   right: 1em; /* positioning links */
   text-align: center; /* centering links */
+}
+
+.timeSlot {
+  display: flex;
+  padding-top: 1em;
+  justify-content: space-evenly;
+}
+
+.timeSlotCard {
+  border: 1px solid #ccc;
+  position: relative; /* this line is important */
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+  margin: 1em;
+  padding: 1em;
 }

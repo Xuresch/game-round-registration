@@ -1,17 +1,16 @@
 import React from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import { useRouter } from "next/router";
-import { da } from "date-fns/locale";
 import { env } from "@/helpers/env";
 import Card from "@/components/shared/card";
 import styles from "@/styles/UpdateEvent.module.css";
 import { formatISO } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -64,8 +63,13 @@ function UpdateEventPage({ eventId }) {
       startDate: "",
       endDate: "",
       organizerId: "",
-      timeSlots: "",
+      timeSlots: [{ start: "", end: "" }],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "timeSlots",
   });
 
   // Function to convert date to user's timezone and format it
@@ -96,9 +100,22 @@ function UpdateEventPage({ eventId }) {
         userTimezone
       );
 
+      formattedEvent.timeSlots = jsonToArray(event.timeSlots);
+
       reset(formattedEvent); // Reset form with the fetched data
     }
   }, [event, reset]);
+
+  function arrayToJson(timeSlots) {
+    return timeSlots.reduce((json, slot, index) => {
+      json[`slot_${index + 1}`] = slot;
+      return json;
+    }, {});
+  }
+
+  function jsonToArray(json) {
+    return Object.values(json);
+  }
 
   const onSubmit = async (data) => {
     data = {
@@ -107,7 +124,7 @@ function UpdateEventPage({ eventId }) {
       startDate: data.startDate,
       endDate: data.endDate,
       organizerId: data.organizerId,
-      timeSlots: data.timeSlots ? JSON.parse(data.timeSlots) : null,
+      timeSlots: arrayToJson(data.timeSlots),
     };
 
     try {
@@ -167,12 +184,12 @@ function UpdateEventPage({ eventId }) {
       <div className={styles.content}>
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
           <label className={styles.label}>
-            ID
+            ID:
             <Controller
               control={control}
               name="id"
               render={({ field }) => (
-                <input className={styles.input} {...field} />
+                <input className={styles.input} {...field} readOnly  />
               )}
             />
             {errors.id && (
@@ -181,7 +198,7 @@ function UpdateEventPage({ eventId }) {
           </label>
 
           <label className={styles.label}>
-            Organizer ID
+            Organizer ID:
             <Controller
               control={control}
               name="organizerId"
@@ -195,7 +212,7 @@ function UpdateEventPage({ eventId }) {
           </label>
 
           <label className={styles.label}>
-            Name
+            Name:
             <Controller
               control={control}
               name="name"
@@ -207,7 +224,7 @@ function UpdateEventPage({ eventId }) {
           </label>
 
           <label className={styles.label}>
-            Description
+            Description:
             <Controller
               control={control}
               name="description"
@@ -221,7 +238,7 @@ function UpdateEventPage({ eventId }) {
           </label>
 
           <label className={styles.label}>
-            Start Date
+            Start Date:
             <Controller
               control={control}
               name="startDate"
@@ -239,7 +256,7 @@ function UpdateEventPage({ eventId }) {
           </label>
 
           <label className={styles.label}>
-            End Date
+            End Date:
             <Controller
               control={control}
               name="endDate"
@@ -256,18 +273,64 @@ function UpdateEventPage({ eventId }) {
             )}
           </label>
 
-          <label className={styles.label}>
-            Time Slots
-            <Controller
-              control={control}
-              name="timeSlots"
-              render={({ field }) => (
-                <textarea className={styles.input} {...field} />
-              )}
-            />
-            {errors.timeSlots && (
-              <p className={styles.error}>Time Slots is required</p>
-            )}
+          <label className={`${styles.label} ${styles.timeSlots}`}>
+            Time Slots:
+            {fields.map((field, index) => (
+              <fieldset className={styles.timeSlotCard} key={field.id}>
+                <label className={styles.label}>
+                  Time Slot {index + 1}
+                  <div className={styles.timeSlot}>
+                    <label className={styles.label}>
+                      Start:
+                      <Controller
+                        control={control}
+                        name={`timeSlots[${index}].start`}
+                        render={({ field }) => (
+                          <input
+                            className={styles.input}
+                            type="datetime-local"
+                            placeholder="Start time"
+                            {...field}
+                          />
+                        )}
+                      />
+                    </label>
+                    <label className={styles.label}>
+                      Ende:
+                      <Controller
+                        control={control}
+                        name={`timeSlots[${index}].end`}
+                        render={({ field }) => (
+                          <input
+                            className={styles.input}
+                            type="datetime-local"
+                            placeholder="End time"
+                            {...field}
+                          />
+                        )}
+                      />
+                    </label>
+                    <div className={styles.links}>
+                      <button
+                        className={`${styles.button} ${styles.save}`}
+                        type="button"
+                        onClick={() => append({ start: "", end: "" })}
+                      >
+                        <FontAwesomeIcon icon={faPlus} size="lg" />
+                      </button>
+                      <button
+                        className={`${styles.button} ${styles.cancel}`}
+                        type="button"
+                        onClick={() => remove(index)}
+                      >
+                        <FontAwesomeIcon icon={faTrashCan} size="lg" />
+                      </button>
+                    </div>
+                  </div>
+                </label>
+              </fieldset>
+            ))}
+            <div className={styles.buttonWrapper}></div>
           </label>
           <div className={styles.buttonWrapper}>
             <button className={`${styles.button} ${styles.save}`} type="submit">
