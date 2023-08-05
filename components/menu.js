@@ -10,7 +10,7 @@ const Menu = () => {
 
   const users = [
     { id: "1", path: "/join", lable: "Registrieren" },
-    { id: "2", path: "/", lable: "Login" },
+    { id: "2", path: "/login?type=normal", lable: "Login" },
   ];
 
   return (
