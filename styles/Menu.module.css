@@ -35,3 +35,16 @@
 .log_in {
   float: right;
 }
+
+.user {
+  float: right;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.user > p {
+margin: 1.5em 0;
+}
+

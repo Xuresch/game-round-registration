@@ -4,24 +4,21 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import axios from "axios";
 import { mutate } from 'swr';
 
-import styles from "@/styles/Join.module.css";
+import styles from "@/styles/Auth.module.css";
 import Card from "@/components/shared/card";
 import { env } from "@/helpers/env";
-import { useApiRequest } from "@/hooks/useApiRequest";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
-  username: Yup.string(),
   email: Yup.string().required(),
   password: Yup.string().required(),
-  role: Yup.string().required(),
 });
 
-function JoinPage() {
+function AuthPage() {
   const router = useRouter();
-
   const {
     control,
     handleSubmit,
@@ -30,45 +27,36 @@ function JoinPage() {
     resolver: yupResolver(schema),
     defaultValues: {
       email: "",
-      username: "",
       password: "",
-      role: "normal",
     },
   });
 
-  const {
-    fetchData: createUser,
-    data: createUserData,
-    loading: createUserLoading,
-    error: createUserError,
-  } = useApiRequest(`${env.BASE_API_URL}/users`, "POST", null, false);
-
   const onSubmit = async (data) => {
-    console.log("submit", data);
     try {
-      await createUser(data);
-      mutate(`${env.BASE_API_URL}/auth/user`);
+      const response = await axios.post(`${env.BASE_API_URL}/auth/login`, data);
+      if (response.data.done) {
+        mutate(`${env.BASE_API_URL}/auth/user`);
+        router.push(`${env.BASE_URL}`);
+      }
     } catch (err) {
       console.error(err);
     }
   };
 
-  React.useEffect(() => {
-    if (!createUserLoading && !createUserError && createUserData) {
-      router.push(`${env.BASE_URL}/events`);
-    }
-  }, [createUserLoading, createUserError, createUserData]);
-
   return (
     <Card>
       <div className={styles.header}>
-        <h2 className={styles.title}>Registrierung</h2>
+        <h2 className={styles.title}>Login</h2>
         <p className={styles.subtitle}>
-          Registrier dich jetzt um deine Spielrunden zu organisieren und anzubieten.
+          Log dich jetzt ein um deine Spielrunden zu organisieren und
+          anzubieten.
         </p>
         <p className={styles.subtitle}>
-          Hast du schon einen Account? Dann geht es hier zum {" "}
-          <Link className={styles.loginLink} href="/auth">Login</Link> {" !"} 
+          Hast du noch keinen Account? Dann geht es hier zur{" "}
+          <Link className={styles.registrationLink} href="/join">
+            Registrierung
+          </Link>{" "}
+          {" !"}
         </p>
       </div>
       <div className={styles.content}>
@@ -87,19 +75,6 @@ function JoinPage() {
             )}
           </label>
           <label className={styles.label}>
-            Username:
-            <Controller
-              control={control}
-              name="username"
-              render={({ field }) => (
-                <input className={styles.input} {...field} />
-              )}
-            />
-            {errors.username && (
-              <p className={styles.error}>This field is required</p>
-            )}
-          </label>
-          <label className={styles.label}>
             Password:
             <Controller
               control={control}
@@ -114,7 +89,7 @@ function JoinPage() {
           </label>
           <div className={styles.buttonWrapper}>
             <button className={styles.button} type="submit">
-              Registrieren
+              Login
             </button>
           </div>
         </form>
@@ -123,4 +98,4 @@ function JoinPage() {
   );
 }
 
-export default JoinPage;
+export default AuthPage;
