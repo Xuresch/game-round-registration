@@ -11,7 +11,6 @@ import { formatISO } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
-import useSWR from "swr";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -22,11 +21,7 @@ const schema = Yup.object().shape({
   // Add validation rules for other fields...
 });
 
-const fetcher = (url) => axios.get(url).then((res) => res.data);
-
 function UpdateEventPage({ eventId }) {
-  const { data: userData } = useSWR(`${env.BASE_API_URL}/auth/user`, fetcher);
-  const user = userData?.user;
   const router = useRouter();
 
   const {
@@ -128,7 +123,7 @@ function UpdateEventPage({ eventId }) {
       description: data.description,
       startDate: data.startDate,
       endDate: data.endDate,
-      organizerId: Number(data.organizerId),
+      organizerId: data.organizerId,
       timeSlots: arrayToJson(data.timeSlots),
     };
 
@@ -177,50 +172,44 @@ function UpdateEventPage({ eventId }) {
     <Card>
       <div className={styles.header}>
         <h2 className={styles.title}>Update Event {event.name}</h2>
-        {user && (user.role === "admin" || user.id === event.organizerId) && (
-          <div className={styles.links}>
-            <button
-              onClick={handleDelete}
-              className={`${styles.button} ${styles.cancel}`}
-            >
-              <FontAwesomeIcon icon={faTrashCan} size="lg" />
-            </button>
-          </div>
-        )}
+        <div className={styles.links}>
+          <button
+            onClick={handleDelete}
+            className={`${styles.button} ${styles.cancel}`}
+          >
+            <FontAwesomeIcon icon={faTrashCan} size="lg" />
+          </button>
+        </div>
       </div>
       <div className={styles.content}>
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-          {user && user.role === "admin" && (
-            <label className={styles.label}>
-              ID:
-              <Controller
-                control={control}
-                name="id"
-                render={({ field }) => (
-                  <input className={styles.input} {...field} readOnly />
-                )}
-              />
-              {errors.id && (
-                <p className={styles.error}>This field is required</p>
+          <label className={styles.label}>
+            ID:
+            <Controller
+              control={control}
+              name="id"
+              render={({ field }) => (
+                <input className={styles.input} {...field} readOnly />
               )}
-            </label>
-          )}
+            />
+            {errors.id && (
+              <p className={styles.error}>This field is required</p>
+            )}
+          </label>
 
-          {user && user.role === "admin" && (
-            <label className={styles.label}>
-              Organizer ID:
-              <Controller
-                control={control}
-                name="organizerId"
-                render={({ field }) => (
-                  <input className={styles.input} {...field} />
-                )}
-              />
-              {errors.organizerId && (
-                <p className={styles.error}>This field is required</p>
+          <label className={styles.label}>
+            Organizer ID:
+            <Controller
+              control={control}
+              name="organizerId"
+              render={({ field }) => (
+                <input className={styles.input} {...field} />
               )}
-            </label>
-          )}
+            />
+            {errors.organizerId && (
+              <p className={styles.error}>This field is required</p>
+            )}
+          </label>
 
           <label className={styles.label}>
             Name:
@@ -321,47 +310,38 @@ function UpdateEventPage({ eventId }) {
                         )}
                       />
                     </label>
-                    {user &&
-                      (user.role === "admin" ||
-                        user.id === event.organizerId) && (
-                        <div className={styles.links}>
-                          <button
-                            className={`${styles.button} ${styles.save}`}
-                            type="button"
-                            onClick={() => append({ start: "", end: "" })}
-                          >
-                            <FontAwesomeIcon icon={faPlus} size="lg" />
-                          </button>
-                          <button
-                            className={`${styles.button} ${styles.cancel}`}
-                            type="button"
-                            onClick={() => remove(index)}
-                          >
-                            <FontAwesomeIcon icon={faTrashCan} size="lg" />
-                          </button>
-                        </div>
-                      )}
+                    <div className={styles.links}>
+                      <button
+                        className={`${styles.button} ${styles.save}`}
+                        type="button"
+                        onClick={() => append({ start: "", end: "" })}
+                      >
+                        <FontAwesomeIcon icon={faPlus} size="lg" />
+                      </button>
+                      <button
+                        className={`${styles.button} ${styles.cancel}`}
+                        type="button"
+                        onClick={() => remove(index)}
+                      >
+                        <FontAwesomeIcon icon={faTrashCan} size="lg" />
+                      </button>
+                    </div>
                   </div>
                 </label>
               </fieldset>
             ))}
           </label>
-          {user && (user.role === "admin" || user.id === event.organizerId) && (
-            <div className={styles.buttonWrapper}>
-              <button
-                className={`${styles.button} ${styles.save}`}
-                type="submit"
-              >
-                Event speichern
-              </button>
-              <button
-                onClick={handleCancel}
-                className={`${styles.button} ${styles.cancel}`}
-              >
-                Abbrechen
-              </button>
-            </div>
-          )}
+          <div className={styles.buttonWrapper}>
+            <button className={`${styles.button} ${styles.save}`} type="submit">
+              Event speichern
+            </button>
+            <button
+              onClick={handleCancel}
+              className={`${styles.button} ${styles.cancel}`}
+            >
+              Abbrechen
+            </button>
+          </div>
         </form>
       </div>
     </Card>
@@ -372,7 +352,7 @@ export async function getServerSideProps(context) {
   const eventId = context.params.id;
 
   return {
-    props: { eventId},
+    props: { eventId },
   };
 }
 

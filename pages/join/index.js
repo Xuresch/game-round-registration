@@ -4,7 +4,6 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { mutate } from 'swr';
 
 import styles from "@/styles/Join.module.css";
 import Card from "@/components/shared/card";
@@ -47,7 +46,6 @@ function JoinPage() {
     console.log("submit", data);
     try {
       await createUser(data);
-      mutate(`${env.BASE_API_URL}/auth/user`);
     } catch (err) {
       console.error(err);
     }
@@ -67,8 +65,8 @@ function JoinPage() {
           Registrier dich jetzt um deine Spielrunden zu organisieren und anzubieten.
         </p>
         <p className={styles.subtitle}>
-          Hast du schon einen Account? Dann geht es hier zum {" "}
-          <Link className={styles.loginLink} href="/auth">Login</Link> {" !"} 
+          Hast du schon einen account? Dann geht es hier zum {" "}
+          <Link className={styles.loginLink} href="/login">Login</Link> {" !"} 
         </p>
       </div>
       <div className={styles.content}>

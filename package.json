@@ -24,7 +24,6 @@
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
     "dotenv": "^16.3.1",
-    "iron-session": "^6.3.1",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.1",
     "next": "13.4.10",
@@ -35,7 +34,6 @@
     "sqlite3": "^5.1.6",
     "swagger-ui-dist": "^5.3.1",
     "swagger-ui-react": "^5.3.1",
-    "swr": "^2.2.0",
     "yup": "^1.2.0"
   },
   "devDependencies": {

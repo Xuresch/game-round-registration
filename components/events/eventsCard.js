@@ -9,10 +9,8 @@ import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
-import useSWR from "swr";
 
 import { useApiRequest } from "@/hooks/useApiRequest";
-import { env } from "@/helpers/env";
 
 function trimText(text, lengthLimit) {
   return text.length > lengthLimit
@@ -20,14 +18,9 @@ function trimText(text, lengthLimit) {
     : text;
 }
 
-const fetcher = (url) => axios.get(url).then((res) => res.data);
-
 function EventCard({ event }) {
   const router = useRouter();
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  const { data: userData } = useSWR(`${env.BASE_API_URL}/auth/user`, fetcher);
-  const user = userData?.user;
 
   const startDate = utcToZonedTime(new Date(event.startDate), userTimeZone);
   const endDate = utcToZonedTime(new Date(event.endDate), userTimeZone);
@@ -45,7 +38,11 @@ function EventCard({ event }) {
     data: deleteEventData,
     loading: deleteEventLoading,
     error: deleteEventError,
-  } = useApiRequest(`${env.BASE_API_URL}/events/${event.id}`, "DELETE", false);
+  } = useApiRequest(
+    `http://localhost:3000/api/events/${event.id}`,
+    "DELETE",
+    false
+  );
 
   const handleDelete = async () => {
     try {
@@ -56,12 +53,12 @@ function EventCard({ event }) {
   };
 
   const handleUpdate = () => {
-    router.push(`${env.BASE_URL}/events/${event.id}/update`);
+    router.push(`http://localhost:3000/events/${event.id}/update`);
   };
 
   React.useEffect(() => {
     if (!deleteEventLoading && !deleteEventError && deleteEventData) {
-      router.push(`${env.BASE_URL}/events`);
+      router.push(`http://localhost:3000/events`);
     }
   }, [deleteEventLoading, deleteEventError, deleteEventData]);
 
@@ -81,30 +78,21 @@ function EventCard({ event }) {
         {trimText(event.description, 300)}
       </p>
       <div className={styles.links}>
-        {user && (user.role === "admin" || user.id === event.organizerId) && (
-          <button
-            onClick={handleUpdate}
-            className={`${styles.button} ${styles.edit}`}
-          >
-            <FontAwesomeIcon icon={faPenToSquare} size="lg" />
-          </button>
-        )}
         <button
-          onClick={() => {
-            router.push(`${env.BASE_URL}/events/${event.id}`);
-          }}
-          className={styles.button}
+          onClick={handleUpdate}
+          className={`${styles.button} ${styles.edit}`}
         >
-          mehr erfahren
+          <FontAwesomeIcon icon={faPenToSquare} size="lg" />
         </button>
-        {user && (user.role === "admin" || user.id === event.organizerId) && (
-          <button
-            onClick={handleDelete}
-            className={`${styles.button} ${styles.delete}`}
-          >
-            <FontAwesomeIcon icon={faTrashCan} size="lg" />
-          </button>
-        )}
+        <Link href={`/events/${event.id}`} className={styles.button}>
+          mehr erfahren
+        </Link>
+        <button
+          onClick={handleDelete}
+          className={`${styles.button} ${styles.delete}`}
+        >
+          <FontAwesomeIcon icon={faTrashCan} size="lg" />
+        </button>
       </div>
     </div>
   );

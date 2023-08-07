@@ -10,7 +10,6 @@ import GameRound from "@/components/rounds/roundsCard";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import { env } from "@/helpers/env";
 import Card from "@/components/shared/card";
-import useSWR from "swr";
 
 function Loading() {
   return (
@@ -33,11 +32,7 @@ function Error({ title, message }) {
   );
 }
 
-const fetcher = (url) => axios.get(url).then((res) => res.data);
-
 function EventPage({ eventId }) {
-  const { data: userData } = useSWR(`${env.BASE_API_URL}/auth/user`, fetcher);
-  const user = userData?.user;
   const router = useRouter();
   const {
     data: event,
@@ -105,22 +100,20 @@ function EventPage({ eventId }) {
     <Card>
       <div className={styles.header}>
         <h2 className={styles.title}>{event.name}</h2>
-        {user && (user.role === "admin" || user.id === event.organizerId) && (
-          <div className={styles.links}>
-            <button
-              onClick={handleUpdate}
-              className={`${styles.button} ${styles.edit}`}
-            >
-              <FontAwesomeIcon icon={faPenToSquare} size="lg" />
-            </button>
-            <button
-              onClick={handleDelete}
-              className={`${styles.button} ${styles.delete}`}
-            >
-              <FontAwesomeIcon icon={faTrashCan} size="lg" />
-            </button>
-          </div>
-        )}
+        <div className={styles.links}>
+          <button
+            onClick={handleUpdate}
+            className={`${styles.button} ${styles.edit}`}
+          >
+            <FontAwesomeIcon icon={faPenToSquare} size="lg" />
+          </button>
+          <button
+            onClick={handleDelete}
+            className={`${styles.button} ${styles.delete}`}
+          >
+            <FontAwesomeIcon icon={faTrashCan} size="lg" />
+          </button>
+        </div>
       </div>
       <div className={styles.content}>
         <div className={styles.informations}>
