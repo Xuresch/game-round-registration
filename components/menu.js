@@ -1,17 +1,24 @@
 import Link from "next/link";
+import { useState, useEffect } from 'react';
 import styles from "@/styles/Menu.module.css";
 
 const Menu = () => {
+
   const sites = [
     { id: "1", path: "/", lable: "Startseite" },
     { id: "2", path: "/events", lable: "Veranstaltungen" },
     { id: "3", path: "/rounds", lable: "Spielrunden" },
   ];
 
-  const users = [
-    { id: "1", path: "/join", lable: "Registrieren" },
-    { id: "2", path: "/login?type=normal", lable: "Login" },
-  ];
+  const users = false
+    ? [
+        { id: "1", path: "/profile", lable: "Profile" },
+        { id: "2", path: "#", lable: "Logout" },
+      ]
+    : [
+        { id: "1", path: "/join", lable: "Registrieren" },
+        { id: "2", path: "/auth", lable: "Login" },
+      ];
 
   return (
     <nav className={styles.menu}>

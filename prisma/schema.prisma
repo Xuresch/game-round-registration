@@ -10,12 +10,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model User {
-  id          Int       @id @default(autoincrement())
-  username    String?   // Optional for temporary users
-  email       String    @unique
-  password    String
-  role        String    @default("temporary") // Possible values: temporary, normal, organizer, admin
+  id            String    @id @default(cuid())
+  name          String?   
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  userName      String?   @unique
+  role        String    @default("normal") // Possible values: normal, organizer, admin
   expiryDate  DateTime? // Optional, only for temporary users
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -23,11 +52,27 @@ model User {
   OrganizedEvents   Event[]
   MasteredGameRounds GameRound[]
   PlayerRegistrations PlayerRegistration[]
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model TempUserData {
+  email     String   @id @unique
+  userName      String
+  createdAt DateTime @default(now())
 }
 
 model Event {
   id          String    @id @default(uuid())
-  organizerId Int
+  organizerId String
   Organizer   User      @relation(fields: [organizerId], references: [id])
   name        String
   description String?
@@ -44,7 +89,7 @@ model GameRound {
   id              String       @id @default(uuid())
   eventId         String?
   Event           Event?    @relation(fields: [eventId], references: [id])
-  gameMasterId    Int
+  gameMasterId    String
   GameMaster      User      @relation(fields: [gameMasterId], references: [id])
   name            String
   description     String?
@@ -65,7 +110,7 @@ model GameRound {
 
 model PlayerRegistration {
   id          Int       @id @default(autoincrement())
-  playerId    Int
+  playerId    String
   Player      User      @relation(fields: [playerId], references: [id])
   gameRoundId String
   GameRound   GameRound @relation(fields: [gameRoundId], references: [id])
