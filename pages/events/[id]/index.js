@@ -5,7 +5,7 @@ import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
-import styles from "@/styles/Event.module.css";
+import styles from "./Event.module.css";
 import GameRound from "@/components/rounds/roundsCard";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import { env } from "@/helpers/env";

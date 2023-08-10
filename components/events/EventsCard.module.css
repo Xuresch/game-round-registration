@@ -1,6 +1,7 @@
+/* Style for the main card container */
 .card {
   border: 1px solid #ccc;
-  position: relative; /* this line is important */
+  position: relative;
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
@@ -10,13 +11,15 @@
   height: 400px;
 }
 
+/* Style for the event title */
 .title {
   font-size: 1.5em;
   color: rgba(0, 0, 0, 0.87);
-  text-align: center; /* center the title */
+  text-align: center;
   margin-bottom: 2em;
 }
 
+/* Generic text style */
 .text {
   font-size: 0.9em;
   color: rgba(0, 0, 0, 0.6);
@@ -24,16 +27,18 @@
   text-overflow: hidden;
 }
 
+/* Style for event description with ellipsis for overflow */
 .description {
   margin-bottom: 2em;
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 6; /* limit to 3 lines of text */
+  -webkit-line-clamp: 6;
   -webkit-box-orient: vertical;
 }
 
+/* Base button style */
 .button {
   background-color: #fff;
   color: #607d8b;
@@ -48,23 +53,27 @@
   height: 42px;
 }
 
+/* Button hover effect */
 .button:hover {
   background-color: #ffc107;
   color: #607d8b;
 }
 
+/* Container for the action links/buttons */
 .links {
-  position: absolute; /* positioning links */
-  bottom: 2em; /* positioning links */
-  left: 0; /* positioning links */
-  right: 0; /* positioning links */
-  text-align: center; /* centering links */
+  position: absolute;
+  bottom: 2em;
+  left: 0;
+  right: 0;
+  text-align: center;
 }
 
+/* Style for the delete button on hover */
 .delete:hover {
   background-color: #f44336;
 }
 
+/* Style for the edit button on hover */
 .edit:hover {
-  background-color: #8BC34A;
+  background-color: #8bc34a;
 }

@@ -5,7 +5,7 @@ import { validate } from "@/helpers/validate";
 
 const schema = Joi.object({
   eventId: Joi.string(),
-  gameMasterId: Joi.number(),
+  gameMasterId: Joi.string(),
   name: Joi.string(),
   description: Joi.string(),
   gameType: Joi.string(),

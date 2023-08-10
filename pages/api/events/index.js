@@ -8,7 +8,7 @@ const schema = Joi.object({
   description: Joi.string().required(),
   startDate: Joi.string().isoDate().required(),
   endDate: Joi.string().isoDate().required(),
-  organizerId: Joi.number().required(),
+  organizerId: Joi.string().required(),
   timeSlots: Joi.object()
     .pattern(
       Joi.string(),

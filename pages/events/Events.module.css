@@ -1,3 +1,4 @@
+/* Container for holding multiple event cards */
 .eventsContainer {
   display: flex;
   flex-wrap: wrap;

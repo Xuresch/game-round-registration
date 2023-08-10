@@ -3,7 +3,6 @@ import Joi from "joi";
 import bcrypt from "bcryptjs";
 
 import { validate } from "@/helpers/validate";
-import { de } from "date-fns/locale";
 
 const schema = Joi.object({
   username: Joi.string(),

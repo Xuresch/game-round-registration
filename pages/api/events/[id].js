@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import Joi from "joi";
+
 import { validate } from "@/helpers/validate";
 
 const schema = Joi.object({
@@ -7,7 +8,7 @@ const schema = Joi.object({
   description: Joi.string(),
   startDate: Joi.string().isoDate(),
   endDate: Joi.string().isoDate(),
-  organizerId: Joi.number(),
+  organizerId: Joi.string(),
   timeSlots: Joi.object()
     .pattern(
       Joi.string(),

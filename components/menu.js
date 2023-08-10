@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useState, useEffect } from 'react';
-import styles from "@/styles/Menu.module.css";
+import styles from "./Menu.module.css";
 
 const Menu = () => {
 
@@ -16,8 +16,7 @@ const Menu = () => {
         { id: "2", path: "#", lable: "Logout" },
       ]
     : [
-        { id: "1", path: "/join", lable: "Registrieren" },
-        { id: "2", path: "/auth", lable: "Login" },
+        { id: "1", path: "/auth", lable: "Login" },
       ];
 
   return (

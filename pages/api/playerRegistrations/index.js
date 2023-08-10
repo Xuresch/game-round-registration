@@ -4,7 +4,7 @@ import Joi from "joi";
 import { validate } from "@/helpers/validate";
 
 const schema = Joi.object({
-  playerId: Joi.number().required(),
+  playerId: Joi.string().required(),
   gameRoundId: Joi.string().required(),
   status: Joi.string().valid("registered", "waiting").required(),
   joinedAt: Joi.date().iso().required(),

@@ -6,7 +6,7 @@ import { useApiRequest } from "@/hooks/useApiRequest";
 import { useRouter } from "next/router";
 import { env } from "@/helpers/env";
 import Card from "@/components/shared/card";
-import styles from "@/styles/UpdateEvent.module.css";
+import styles from "./UpdateEvent.module.css";
 import { formatISO } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -114,6 +114,9 @@ function UpdateEventPage({ eventId }) {
   }
 
   function jsonToArray(json) {
+    if (!json) {
+      return [{ start: "", end: "" }];
+    }
     return Object.values(json);
   }
 

@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import styles from "@/styles/GameRoundsCard.module.css";
+import styles from "./RoundsCard.module.css";
 
 function GameRound({ round }) {
   return (
