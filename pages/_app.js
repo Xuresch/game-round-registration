@@ -1,14 +1,18 @@
+import { SessionProvider } from "next-auth/react";
+
 import Menu from "@/components/menu";
 
 import "@/styles/globals.css";
 
-function App({ Component, pageProps }) {
+function App({ Component, pageProps: { session, ...pageProps } }) {
   return (
     <>
-      <Menu />
-      <div className="conntent">
-        <Component {...pageProps} />
-      </div>
+      <SessionProvider session={session}>
+        <Menu />
+        <div className="conntent">
+          <Component {...pageProps} />
+        </div>
+      </SessionProvider>
     </>
   );
 }
