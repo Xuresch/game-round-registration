@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, get } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/router";
 
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 
 import styles from "./Auth.module.css";
 import Card from "@/components/shared/card";
@@ -17,6 +17,21 @@ const schema = Yup.object().shape({
 
 function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false); // Local state to toggle between Sign In and Sign Up
+  const [isLoading, setIsLoading] = useState(true); // Local state to toggle loading state
+  const [loadedSession, setLoadedSession] = useState(null); // Local state to store session data
+
+  useEffect(() => {
+    getSession().then((session) => {
+      if (session) {
+        // If session exists, redirect to home page
+        // router.replace("/");
+        window.location.href = "/events";
+        setLoadedSession(session);
+      } else {
+        setIsLoading(false);
+      }
+    });
+  }, []);
 
   const router = useRouter();
   const {
@@ -31,22 +46,42 @@ function AuthPage() {
     },
   });
 
-  const onSubmit = async (data) => {
-    const { email: originalEmail, userName } = data;
-    const email = originalEmail.toLowerCase();
-    const responseTmp = await fetch(
-      `${env.BASE_API_URL}/auth/storeTempUserData`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, userName }),
-      }
+  if (isLoading) {
+    return (
+      <Card>
+        <h2 className={styles.title}>
+          <p>Loading...</p>
+        </h2>
+      </Card>
     );
-    console.log(responseTmp);
-    const response = await signIn("email", { redirect: false, email });
-    console.log(response);
+  }
+
+  const onSubmit = async (data) => {
+    console.log("onSubmit", data);
+    const { email: originalEmail, userName } = data;
+    if (isSignUp) {
+      const email = originalEmail.toLowerCase();
+      const responseTmp = await fetch(
+        `${env.BASE_API_URL}/auth/storeTempUserData`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, userName }),
+        }
+      );
+      // console.log(responseTmp);
+    }
+    const response = await signIn("email", {
+      redirect: true,
+      email: originalEmail,
+    });
+
+    if (!response.error) {
+      router.replace("/events");
+    }
+    // console.log(response);
   };
 
   return (
