@@ -24,11 +24,20 @@ export default async function auth(req, res) {
         from: process.env.EMAIL_FROM,
       }),
     ],
-    // callbacks: {
-    //   signIn: async (user, account, profile, email, credentials) => {
-    //     console.log("signIn", user, account, profile, email, credentials);
-    //     return true;
-    //   },
-    // },
+    callbacks: {
+      async jwt(token, user, account, profile, isNewUser) {
+          token.id = user.id;
+          token.role = user.role || "user"; // Providing a default if role is undefined
+        return token;
+      },
+      async session(session, token) {
+        // Check if token and token.id exist before assigning
+        if (token) {
+          session.id = token.id || null; 
+          session.role = token.role || "user";
+        }
+        return session;
+      },
+    },
   });
 }
