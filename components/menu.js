@@ -51,6 +51,11 @@ const Menu = () => {
             <Link href="/auth">Login</Link>
           </li>
         )}
+        {loadedSession && (
+          <li className={`${styles.user_name} ${styles.log_in}`}>
+            <p>{loadedSession?.user?.userName}</p>
+          </li>
+        )}
       </ul>
     </nav>
   );

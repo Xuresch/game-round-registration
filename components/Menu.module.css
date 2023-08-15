@@ -51,3 +51,14 @@
   background-color: #ffc107;
   color: #607d8b;
 }
+
+.user_name {
+  float: right;
+  padding: 1.5em 1.5em;
+  color: #fff;
+  margin: 0;
+}
+
+.user_name > p {
+  margin: 0;
+}
