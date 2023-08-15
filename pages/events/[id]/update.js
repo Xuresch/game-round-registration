@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -11,6 +11,8 @@ import { formatISO } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { getSession } from "next-auth/react";
+import prisma from "@/lib/prisma";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -82,8 +84,23 @@ function UpdateEventPage({ eventId }) {
     );
   }
 
+  const [isLoading, setIsLoading] = useState(true); // Local state to toggle loading state
+  const [loadedSession, setLoadedSession] = useState(null); // Local state to store session data
+  const [user, setUser] = useState(null); // Local state to store user data
+
+  useEffect(() => {
+    getSession().then((session) => {
+      if (session) {
+        setLoadedSession(session);
+        setUser(session.user);
+      } else {
+        setIsLoading(false);
+      }
+    });
+  }, []);
+
   // This effect runs whenever 'event' changes. It resets form values.
-  React.useEffect(() => {
+  useEffect(() => {
     if (event) {
       const formattedEvent = { ...event };
 
@@ -150,14 +167,14 @@ function UpdateEventPage({ eventId }) {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!deleteEventLoading && !deleteEventError && deleteEventData) {
       router.push(`${env.BASE_URL}/events`);
     }
   }, [deleteEventLoading, deleteEventError, deleteEventData]);
 
   // handle response from the PUT request
-  React.useEffect(() => {
+  useEffect(() => {
     if (!updateEventLoading && !updateEventError && updatedEventData) {
       router.push(`${env.BASE_URL}/events/${eventId}`);
     }
@@ -186,33 +203,37 @@ function UpdateEventPage({ eventId }) {
       </div>
       <div className={styles.content}>
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-          <label className={styles.label}>
-            ID:
-            <Controller
-              control={control}
-              name="id"
-              render={({ field }) => (
-                <input className={styles.input} {...field} readOnly />
+          {loadedSession && user.role == "admin" && (
+            <label className={styles.label}>
+              ID:
+              <Controller
+                control={control}
+                name="id"
+                render={({ field }) => (
+                  <input className={styles.input} {...field} readOnly />
+                )}
+              />
+              {errors.id && (
+                <p className={styles.error}>This field is required</p>
               )}
-            />
-            {errors.id && (
-              <p className={styles.error}>This field is required</p>
-            )}
-          </label>
+            </label>
+          )}
 
-          <label className={styles.label}>
-            Organizer ID:
-            <Controller
-              control={control}
-              name="organizerId"
-              render={({ field }) => (
-                <input className={styles.input} {...field} />
+          {loadedSession && user.role == "admin" && (
+            <label className={styles.label}>
+              Organizer ID:
+              <Controller
+                control={control}
+                name="organizerId"
+                render={({ field }) => (
+                  <input className={styles.input} {...field} />
+                )}
+              />
+              {errors.organizerId && (
+                <p className={styles.error}>This field is required</p>
               )}
-            />
-            {errors.organizerId && (
-              <p className={styles.error}>This field is required</p>
-            )}
-          </label>
+            </label>
+          )}
 
           <label className={styles.label}>
             Name:
@@ -353,10 +374,27 @@ function UpdateEventPage({ eventId }) {
 
 export async function getServerSideProps(context) {
   const eventId = context.params.id;
+  const session = await getSession({ req: context.req });
 
-  return {
-    props: { eventId },
-  };
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+  });
+
+  if (
+    session?.user?.id === event.organizerId ||
+    session?.user?.role == "admin"
+  ) {
+    return {
+      props: { eventId },
+    };
+  } else {
+    return {
+      redirect: {
+        destination: "/auth",
+        permanent: false,
+      },
+    };
+  }
 }
 
 export default UpdateEventPage;

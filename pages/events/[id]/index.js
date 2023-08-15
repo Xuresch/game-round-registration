@@ -1,9 +1,11 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+
+import { getSession } from "next-auth/react";
 
 import styles from "./Event.module.css";
 import GameRound from "@/components/rounds/roundsCard";
@@ -63,7 +65,22 @@ function EventPage({ eventId }) {
     router.push(`${env.BASE_URL}/events/${eventId}/update`);
   };
 
-  React.useEffect(() => {
+  const [isLoading, setIsLoading] = useState(true); // Local state to toggle loading state
+  const [loadedSession, setLoadedSession] = useState(null); // Local state to store session data
+  const [user, setUser] = useState(null); // Local state to store user data
+
+  useEffect(() => {
+    getSession().then((session) => {
+      if (session) {
+        setLoadedSession(session);
+        setUser(session.user);
+      } else {
+        setIsLoading(false);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     if (!deleteEventLoading && !deleteEventError && deleteEventData) {
       router.push(`${env.BASE_URL}/events`);
     }
@@ -100,20 +117,22 @@ function EventPage({ eventId }) {
     <Card>
       <div className={styles.header}>
         <h2 className={styles.title}>{event.name}</h2>
-        <div className={styles.links}>
-          <button
-            onClick={handleUpdate}
-            className={`${styles.button} ${styles.edit}`}
-          >
-            <FontAwesomeIcon icon={faPenToSquare} size="lg" />
-          </button>
-          <button
-            onClick={handleDelete}
-            className={`${styles.button} ${styles.delete}`}
-          >
-            <FontAwesomeIcon icon={faTrashCan} size="lg" />
-          </button>
-        </div>
+        {loadedSession && (user.id === event.organizerId || user.role == "admin") && (
+          <div className={styles.links}>
+            <button
+              onClick={handleUpdate}
+              className={`${styles.button} ${styles.edit}`}
+            >
+              <FontAwesomeIcon icon={faPenToSquare} size="lg" />
+            </button>
+            <button
+              onClick={handleDelete}
+              className={`${styles.button} ${styles.delete}`}
+            >
+              <FontAwesomeIcon icon={faTrashCan} size="lg" />
+            </button>
+          </div>
+        )}
       </div>
       <div className={styles.content}>
         <div className={styles.informations}>
