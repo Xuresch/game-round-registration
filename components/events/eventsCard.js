@@ -11,7 +11,10 @@ import { getSession } from "next-auth/react";
 
 // Import custom hooks and styles
 import { useApiRequest } from "@/hooks/useApiRequest";
+import SmallCard from "@/components/shared/smallCard";
 import styles from "./EventsCard.module.css";
+import { env } from "@/helpers/env";
+
 
 // Utility function to trim long text
 function trimText(text, lengthLimit) {
@@ -50,7 +53,7 @@ function EventCard({ event }) {
     loading: deleteEventLoading,
     error: deleteEventError,
   } = useApiRequest(
-    `${process.env.BASE_API_URL}/events/${eventId}`, // Use environment variable
+    `${env.BASE_API_URL}/events/${eventId}`, // Use environment variable
     "DELETE",
     false
   );
@@ -93,34 +96,38 @@ function EventCard({ event }) {
 
   // Render the event card
   return (
-    <div className={styles.card}>
-      <h2 className={styles.title}>{name}</h2>
-      <div className={styles.description}>{trimText(description, 150)}</div>
-      <div className={styles.dateRange}>
-        {formattedStartDate} - {formattedEndDate}
-      </div>
-      <div className={styles.links}>
-        {loadedSession && (user.id === organizerId || user.role == "admin") && (
-          <button
-            onClick={handleUpdate}
-            className={`${styles.button} ${styles.edit}`}
-          >
-            <FontAwesomeIcon icon={faPenToSquare} size="lg" />
-          </button>
-        )}
-        <Link href={`/events/${eventId}`} className={styles.button}>
-          mehr erfahren
-        </Link>
-        {loadedSession && (user.id === organizerId || user.role == "admin") && (
-          <button
-            onClick={handleDelete}
-            className={`${styles.button} ${styles.delete}`}
-          >
-            <FontAwesomeIcon icon={faTrashCan} size="lg" />
-          </button>
-        )}
-      </div>
-    </div>
+    <>
+      <SmallCard>
+        <h2 className={styles.title}>{name}</h2>
+        <div className={styles.description}>{trimText(description, 150)}</div>
+        <div className={styles.dateRange}>
+          {formattedStartDate} - {formattedEndDate}
+        </div>
+        <div className={styles.links}>
+          {loadedSession &&
+            (user.id === organizerId || user.role == "admin") && (
+              <button
+                onClick={handleUpdate}
+                className={`${styles.button} ${styles.edit}`}
+              >
+                <FontAwesomeIcon icon={faPenToSquare} size="lg" />
+              </button>
+            )}
+          <Link href={`/events/${eventId}`} className={styles.button}>
+            mehr erfahren
+          </Link>
+          {loadedSession &&
+            (user.id === organizerId || user.role == "admin") && (
+              <button
+                onClick={handleDelete}
+                className={`${styles.button} ${styles.delete}`}
+              >
+                <FontAwesomeIcon icon={faTrashCan} size="lg" />
+              </button>
+            )}
+        </div>
+      </SmallCard>
+    </>
   );
 }
 
