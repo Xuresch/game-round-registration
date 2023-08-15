@@ -7,12 +7,14 @@ import { useRouter } from "next/router";
 import { env } from "@/helpers/env";
 import Card from "@/components/shared/card";
 import styles from "./UpdateEvent.module.css";
+import stylesDropdown from "@/styles/SelectMaterial.module.css";
 import { formatISO } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { getSession } from "next-auth/react";
 import prisma from "@/lib/prisma";
+import Select from "react-select";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -23,8 +25,27 @@ const schema = Yup.object().shape({
   // Add validation rules for other fields...
 });
 
+const customStyles = {
+  container: (provided) => ({
+    ...provided,
+    ...styles.selectContainer,
+  }),
+  control: (provided, state) => ({
+    ...provided,
+    ...styles.selectControl,
+    "&:hover": state.isFocused ? styles.selectControlHover : {},
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    ...styles.selectOption,
+    "&:hover": state.isSelected ? styles.selectOptionHover : {},
+  }),
+};
+
 function UpdateEventPage({ eventId }) {
   const router = useRouter();
+
+  const { data: users } = useApiRequest(`${env.BASE_API_URL}/users`);
 
   const {
     data: event,
@@ -68,6 +89,17 @@ function UpdateEventPage({ eventId }) {
       timeSlots: [{ start: "", end: "" }],
     },
   });
+
+  const userOptions = users?.map((user) => ({
+    value: user.id,
+    label: user.userName || user.email,
+  }));
+
+  const defaultOrganizer = userOptions?.find(
+    (user) => user.value === event?.organizerId
+  );
+
+  const [selectedUser, setSelectedUser] = useState(defaultOrganizer);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -221,16 +253,28 @@ function UpdateEventPage({ eventId }) {
 
           {loadedSession && user.role == "admin" && (
             <label className={styles.label}>
-              Organizer ID:
+              Organizer: {selectedUser?.label || defaultOrganizer.label}
               <Controller
                 control={control}
                 name="organizerId"
                 render={({ field }) => (
-                  <input className={styles.input} {...field} />
+                  <Select
+                    styles={customStyles}
+                    key={event.organizerId}
+                    {...field}
+                    options={userOptions}
+                    isSearchable={true}
+                    // placeholder="Search for an Organizer..."
+                    onChange={(option) => {
+                      field.onChange(option.value);
+                      setSelectedUser(option);
+                    }}
+                    defaultValue={defaultOrganizer.label}
+                  />
                 )}
               />
               {errors.organizerId && (
-                <p className={styles.error}>This field is required</p>
+                <p className={styles.error}>Organizer ID is required</p>
               )}
             </label>
           )}
