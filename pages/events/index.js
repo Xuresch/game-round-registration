@@ -57,7 +57,7 @@ function EventsPage({ events }) {
           <EventsCard key={event.id} event={event} />
         ))}
         {loadedSession &&
-          (user.role == "admin" || user.role == "organisator") && (
+          (user.role == "admin" || user.role == "organizer") && (
             <SmallCard>
               <div
                 className={styles.eventAddContainer}

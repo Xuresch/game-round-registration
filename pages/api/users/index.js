@@ -15,7 +15,22 @@ const schema = Joi.object({
 
 export default async function usersHandler(req, res) {
   if (req.method === "GET") {
-    const users = await prisma.user.findMany();
+    const roles = req.query.role;
+
+    let users;
+
+    if (roles) {
+      console.log("role", roles);
+      users = await prisma.user.findMany({
+        where: {
+          role: {
+            in: roles,
+          },
+        },
+      });
+    } else {
+      users = await prisma.user.findMany();
+    }
 
     users.forEach((user) => {
       delete user.password;

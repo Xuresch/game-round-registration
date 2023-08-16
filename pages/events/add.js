@@ -252,7 +252,7 @@ function CreateEventPage({ session }) {
 export async function getServerSideProps(context) {
   const session = await getSession({ req: context.req });
 
-  if (session?.user?.role == "organisator" || session?.user?.role == "admin") {
+  if (session?.user?.role == "organizer" || session?.user?.role == "admin") {
     return {
       props: { session },
     };

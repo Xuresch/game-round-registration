@@ -4,9 +4,10 @@
   color: rgba(0, 0, 0, 0.87);
   text-align: center;
   margin-bottom: 2em;
-  
-} /* Container for holding multiple event cards */
-.eventsContainer {
+}
+
+/* Container for holding multiple event cards */
+.gameRoundsContainer {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -20,7 +21,7 @@
   margin-bottom: 2em;
 }
 
-.eventAddContainer {
+.roundAddContainer {
   display: flex;
   align-items: center;
   justify-content: center;

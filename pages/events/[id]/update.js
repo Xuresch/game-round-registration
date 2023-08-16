@@ -45,7 +45,7 @@ const customStyles = {
 function UpdateEventPage({ eventId }) {
   const router = useRouter();
 
-  const { data: users } = useApiRequest(`${env.BASE_API_URL}/users`);
+  const { data: users } = useApiRequest(`${env.BASE_API_URL}/users?role=admin&role=organizer`);
 
   const {
     data: event,
@@ -220,6 +220,9 @@ function UpdateEventPage({ eventId }) {
     return <p>Error: {eventError.message}</p>;
   }
 
+  console.log("selectedUser:", selectedUser)
+  console.log("defaultOrganizer:", defaultOrganizer)
+
   return (
     <Card>
       <div className={styles.header}>
@@ -253,7 +256,7 @@ function UpdateEventPage({ eventId }) {
 
           {loadedSession && user.role == "admin" && (
             <label className={styles.label}>
-              Organizer: {selectedUser?.label || defaultOrganizer.label}
+              Organizer:
               <Controller
                 control={control}
                 name="organizerId"
@@ -264,7 +267,7 @@ function UpdateEventPage({ eventId }) {
                     {...field}
                     options={userOptions}
                     isSearchable={true}
-                    // placeholder="Search for an Organizer..."
+                    placeholder={`${selectedUser?.label || defaultOrganizer.label}: ${selectedUser?.value || defaultOrganizer.value}`}
                     onChange={(option) => {
                       field.onChange(option.value);
                       setSelectedUser(option);

@@ -3,7 +3,11 @@ import { useRouter } from "next/router";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPenToSquare,
+  faPlus,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { getSession } from "next-auth/react";
 
@@ -12,6 +16,7 @@ import GameRound from "@/components/rounds/roundsCard";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import { env } from "@/helpers/env";
 import Card from "@/components/shared/card";
+import SmallCard from "@/components/shared/smallCard";
 
 function Loading() {
   return (
@@ -63,6 +68,10 @@ function EventPage({ eventId }) {
 
   const handleUpdate = () => {
     router.push(`${env.BASE_URL}/events/${eventId}/update`);
+  };
+
+  const handleAddRoundClick = () => {
+    router.push("/rounds/add");
   };
 
   const [isLoading, setIsLoading] = useState(true); // Local state to toggle loading state
@@ -117,22 +126,23 @@ function EventPage({ eventId }) {
     <Card>
       <div className={styles.header}>
         <h2 className={styles.title}>{event.name}</h2>
-        {loadedSession && (user.id === event.organizerId || user.role == "admin") && (
-          <div className={styles.links}>
-            <button
-              onClick={handleUpdate}
-              className={`${styles.button} ${styles.edit}`}
-            >
-              <FontAwesomeIcon icon={faPenToSquare} size="lg" />
-            </button>
-            <button
-              onClick={handleDelete}
-              className={`${styles.button} ${styles.delete}`}
-            >
-              <FontAwesomeIcon icon={faTrashCan} size="lg" />
-            </button>
-          </div>
-        )}
+        {loadedSession &&
+          (user.id === event.organizerId || user.role == "admin") && (
+            <div className={styles.links}>
+              <button
+                onClick={handleUpdate}
+                className={`${styles.button} ${styles.edit}`}
+              >
+                <FontAwesomeIcon icon={faPenToSquare} size="lg" />
+              </button>
+              <button
+                onClick={handleDelete}
+                className={`${styles.button} ${styles.delete}`}
+              >
+                <FontAwesomeIcon icon={faTrashCan} size="lg" />
+              </button>
+            </div>
+          )}
       </div>
       <div className={styles.content}>
         <div className={styles.informations}>
@@ -150,16 +160,29 @@ function EventPage({ eventId }) {
           <p className={styles.text}>{event.description}</p>
         </div>
       </div>
-      {rounds.length > 0 ? (
-        <div className={styles.rounds}>
-          <h3 className={styles.roundsTitle}>Spielrunden</h3>
-          <div className={styles.roundsContaioner}>
-            {rounds.map((round) => (
-              <GameRound key={round.id} round={round} />
-            ))}
-          </div>
+      <div className={styles.rounds}>
+        <h3 className={styles.roundsTitle}>Spielrunden</h3>
+        <div className={styles.roundsContaioner}>
+          {rounds.length > 0 ? (
+            <>
+              {rounds.map((round) => (
+                <GameRound key={round.id} round={round} />
+              ))}
+            </>
+          ) : null}
+          {loadedSession && (
+            <SmallCard>
+              <div
+                className={styles.roundAddContainer}
+                onClick={handleAddRoundClick}
+              >
+                <h2 className={styles.title}>Neue Spielrunde hinzufügen</h2>
+                <FontAwesomeIcon icon={faPlus} size="2xl" />
+              </div>
+            </SmallCard>
+          )}
         </div>
-      ) : null}
+      </div>
     </Card>
   );
 }
