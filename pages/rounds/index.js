@@ -7,14 +7,12 @@ import axios from "axios";
 
 // Import environment helper to get environment variables
 import { env } from "@/helpers/env";
-import SmallCard from "@/components/shared/smallCard";
 import GameRound from "@/components/rounds/roundsCard";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { getSession } from "next-auth/react";
 import { useApiRequest } from "@/hooks/useApiRequest";
+import ActionCard from "@/components/shared/actionCard/ActionCard";
 
 // export async function getServerSideProps() {
 //   const res = await axios.get(`${env.BASE_API_URL}/gameRounds`);
@@ -62,15 +60,10 @@ function RoundPage() {
           <GameRound key={round.id} round={round} />
         ))}
         {loadedSession && (
-          <SmallCard>
-            <div
-              className={styles.roundAddContainer}
-              onClick={handleAddRoundClick}
-            >
-              <h2 className={styles.title}>Neue Spielrunde hinzufügen</h2>
-              <FontAwesomeIcon icon={faPlus} size="2xl" />
-            </div>
-          </SmallCard>
+          <ActionCard
+            title="Neue Spielrunde hinzufügen!"
+            onClickHandler={handleAddRoundClick}
+          />
         )}
       </div>
     </>
