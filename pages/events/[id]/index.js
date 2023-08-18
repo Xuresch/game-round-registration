@@ -5,7 +5,6 @@ import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPenToSquare,
-  faPlus,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -16,7 +15,7 @@ import GameRound from "@/components/rounds/roundsCard";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import { env } from "@/helpers/env";
 import Card from "@/components/shared/card";
-import SmallCard from "@/components/shared/smallCard";
+import ActionCard from "@/components/shared/actionCard/ActionCard";
 
 function Loading() {
   return (
@@ -171,15 +170,10 @@ function EventPage({ eventId }) {
             </>
           ) : null}
           {loadedSession && (
-            <SmallCard>
-              <div
-                className={styles.roundAddContainer}
-                onClick={handleAddRoundClick}
-              >
-                <h2 className={styles.title}>Neue Spielrunde hinzufügen</h2>
-                <FontAwesomeIcon icon={faPlus} size="2xl" />
-              </div>
-            </SmallCard>
+            <ActionCard
+              title="Neue Spielrunde hinzufügen!"
+              onClickHandler={handleAddRoundClick}
+            />
           )}
         </div>
       </div>

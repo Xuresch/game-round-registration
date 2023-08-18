@@ -1,0 +1,26 @@
+/* 
+`${styles.ActionCardTitle}`:
+The title for the Action Card.
+It has a larger font size, centered text, and a margin below.
+*/
+.ActionCardTitle {
+  font-size: 1.5em;
+  color: rgba(0, 0, 0, 0.87);
+  text-align: center;
+  margin-bottom: 2em;
+}
+
+/* 
+  `${styles.ActionCardContainer}`:
+  The container for the Action Card's content.
+  It's designed to center its children both vertically and horizontally and arrange them in a column.
+  It also changes the cursor to a pointer to indicate interactivity.
+  */
+.ActionCardContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+  cursor: pointer;
+}

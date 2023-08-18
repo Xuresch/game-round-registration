@@ -7,12 +7,10 @@ import axios from "axios";
 
 // Import environment helper to get environment variables
 import { env } from "@/helpers/env";
-import SmallCard from "@/components/shared/smallCard";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { getSession } from "next-auth/react";
+import ActionCard from "@/components/shared/actionCard/ActionCard";
 
 // Fetching events data during server-side rendering
 export async function getServerSideProps() {
@@ -58,15 +56,10 @@ function EventsPage({ events }) {
         ))}
         {loadedSession &&
           (user.role == "admin" || user.role == "organizer") && (
-            <SmallCard>
-              <div
-                className={styles.eventAddContainer}
-                onClick={handleAddEventClick}
-              >
-                <h2 className={styles.title}>Add New Event</h2>
-                <FontAwesomeIcon icon={faPlus} size="2xl" />
-              </div>
-            </SmallCard>
+            <ActionCard
+              title="Neue Veranstaltung hinzufügen!"
+              onClickHandler={handleAddEventClick}
+            />
           )}
       </div>
     </>
