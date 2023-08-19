@@ -1,19 +1,10 @@
 import Link from "next/link";
-import { useState, useEffect } from "react";
 import styles from "./Menu.module.css";
-import { getSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
+import useSessionApp from "@/hooks/useSessionApp";
 
 const Menu = () => {
-  const [isSignUp, setIsSignUp] = useState(false); // Local state to toggle between Sign In and Sign Up
-  const [isLoading, setIsLoading] = useState(true); // Local state to toggle loading state
-  const [loadedSession, setLoadedSession] = useState(null); // Local state to store session data
-
-  useEffect(() => {
-    getSession().then((session) => {
-      setLoadedSession(session);
-      setIsLoading(false);
-    });
-  }, []);
+  const {isLoading, loadedSession, user} = useSessionApp();
 
   function logoutHandler() {
     signOut();
