@@ -12,7 +12,37 @@ const schema = Joi.object({
 
 export default async function playerRegistrationsHandler(req, res) {
   if (req.method === "GET") {
-    const playerRegistrations = await prisma.playerRegistration.findMany();
+    const playerId = req.query.playerId;
+    const gameRoundId = req.query.gameRoundId;
+    const status = req.query.status;
+
+    let playerRegistrations;
+
+    if (playerId && gameRoundId) {
+      playerRegistrations = await prisma.playerRegistration.findMany({
+        where: {
+          playerId: playerId,
+          gameRoundId: gameRoundId,
+        },
+      });
+    } else if (status && gameRoundId) {
+      playerRegistrations = await prisma.playerRegistration.findMany({
+        where: {
+          status: status,
+          gameRoundId: gameRoundId,
+        },
+        include: {
+          Player: {
+            select: {
+              userName: true,
+            },
+          },
+        },
+      });
+    } else {
+      playerRegistrations = await prisma.playerRegistration.findMany();
+    }
+
     res.json(playerRegistrations);
   } else if (req.method === "POST") {
     try {

@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
 import Joi from "joi";
-
 import { validate } from "@/helpers/validate";
 
 const schema = Joi.object({
@@ -34,9 +33,20 @@ export default async function gameRoundHandler(req, res) {
     const gameRound = await prisma.gameRound.findUnique({
       where: { id: gameRoundId },
     });
+
+    if (!gameRound) {
+        res.status(404).json({ message: "Game round not found" });
+        return;
+    }
+
+    const registeredPlayersCount = await prisma.playerRegistration.count({
+      where: { gameRoundId: gameRoundId, status: "registered" }
+    });
+
     gameRound.extraDetails = JSON.parse(gameRound.extraDetails);
-    if (!gameRound) res.status(404).json({ message: "Game round not found" });
-    else res.json(gameRound);
+    gameRound.registeredPlayersCount = registeredPlayersCount+3;
+
+    res.json(gameRound);
   } else if (req.method === "PUT") {
     try {
       validate(schema, req.body);
