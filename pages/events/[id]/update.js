@@ -5,9 +5,8 @@ import * as Yup from "yup";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import { useRouter } from "next/router";
 import { env } from "@/helpers/env";
-import Card from "@/components/shared/card";
+import Card from "@/components/shared/card/card";
 import styles from "./UpdateEvent.module.css";
-import stylesDropdown from "@/styles/SelectMaterial.module.css";
 import { formatISO } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -45,7 +44,9 @@ const customStyles = {
 function UpdateEventPage({ eventId }) {
   const router = useRouter();
 
-  const { data: users } = useApiRequest(`${env.BASE_API_URL}/users?role=admin&role=organizer`);
+  const { data: users } = useApiRequest(
+    `${env.BASE_API_URL}/users?role=admin&role=organizer`
+  );
 
   const {
     data: event,
@@ -220,9 +221,6 @@ function UpdateEventPage({ eventId }) {
     return <p>Error: {eventError.message}</p>;
   }
 
-  console.log("selectedUser:", selectedUser)
-  console.log("defaultOrganizer:", defaultOrganizer)
-
   return (
     <Card>
       <div className={styles.header}>
@@ -267,7 +265,9 @@ function UpdateEventPage({ eventId }) {
                     {...field}
                     options={userOptions}
                     isSearchable={true}
-                    placeholder={`${selectedUser?.label || defaultOrganizer.label}: ${selectedUser?.value || defaultOrganizer.value}`}
+                    placeholder={`${
+                      selectedUser?.label || defaultOrganizer.label
+                    }: ${selectedUser?.value || defaultOrganizer.value}`}
                     onChange={(option) => {
                       field.onChange(option.value);
                       setSelectedUser(option);

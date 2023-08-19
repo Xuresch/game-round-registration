@@ -3,19 +3,15 @@ import { useRouter } from "next/router";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPenToSquare,
-  faTrashCan,
-} from "@fortawesome/free-solid-svg-icons";
-
-import { getSession } from "next-auth/react";
+import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./Event.module.css";
 import GameRound from "@/components/rounds/roundsCard";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import { env } from "@/helpers/env";
-import Card from "@/components/shared/card";
+import Card from "@/components/shared/card/card";
 import ActionCard from "@/components/shared/actionCard/ActionCard";
+import useSessionApp from "@/hooks/useSessionApp";
 
 function Loading() {
   return (
@@ -70,23 +66,10 @@ function EventPage({ eventId }) {
   };
 
   const handleAddRoundClick = () => {
-    router.push("/rounds/add");
+    router.push(`/rounds/add?eventIdTest=${eventId}`);
   };
 
-  const [isLoading, setIsLoading] = useState(true); // Local state to toggle loading state
-  const [loadedSession, setLoadedSession] = useState(null); // Local state to store session data
-  const [user, setUser] = useState(null); // Local state to store user data
-
-  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        setLoadedSession(session);
-        setUser(session.user);
-      } else {
-        setIsLoading(false);
-      }
-    });
-  }, []);
+  const { isLoading, loadedSession, user } = useSessionApp();
 
   useEffect(() => {
     if (!deleteEventLoading && !deleteEventError && deleteEventData) {
