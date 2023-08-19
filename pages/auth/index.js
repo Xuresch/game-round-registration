@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { signIn, getSession } from "next-auth/react";
 
 import styles from "./Auth.module.css";
-import Card from "@/components/shared/card";
+import Card from "@/components/shared/card/card";
 import { env } from "@/helpers/env";
 
 // Define validation schema with Yup

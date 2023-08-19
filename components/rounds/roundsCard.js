@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { env } from "@/helpers/env";
 import styles from "./RoundsCard.module.css";
-import SmallCard from "@/components/shared/smallCard";
+import SmallCard from "@/components/shared/smallCard/smallCard";
 import { useEffect, useState } from "react";
 import { getSession } from "next-auth/react";
 

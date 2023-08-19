@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./ActionCard.module.css";
-import SmallCard from "../smallCard";
+import SmallCard from "../smallCard/smallCard";
 
 const ActionCard = ({ title, onClickHandler }) => {
   // Handle key events for accessibility

@@ -11,7 +11,7 @@ import { getSession } from "next-auth/react";
 
 // Import custom hooks and styles
 import { useApiRequest } from "@/hooks/useApiRequest";
-import SmallCard from "@/components/shared/smallCard";
+import SmallCard from "@/components/shared/smallCard/smallCard";
 import styles from "./EventsCard.module.css";
 import { env } from "@/helpers/env";
 
