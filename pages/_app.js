@@ -1,6 +1,6 @@
 import { SessionProvider } from "next-auth/react";
 
-import Menu from "@/components/menu";
+import Menu from "@/components/menu/menu";
 
 import "@/styles/globals.css";
 
