@@ -35,12 +35,12 @@ export default async function gameRoundHandler(req, res) {
     });
 
     if (!gameRound) {
-        res.status(404).json({ message: "Game round not found" });
-        return;
+      res.status(404).json({ message: "Game round not found" });
+      return;
     }
 
     const registeredPlayersCount = await prisma.playerRegistration.count({
-      where: { gameRoundId: gameRoundId, status: "registered" }
+      where: { gameRoundId: gameRoundId, status: "registered" },
     });
 
     gameRound.extraDetails = JSON.parse(gameRound.extraDetails);

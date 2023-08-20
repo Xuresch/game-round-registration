@@ -65,21 +65,6 @@
   color: #607d8b;
 }
 
-.links {
-  position: absolute; /* positioning links */
-  top: 1em; /* positioning links */
-  right: 1em; /* positioning links */
-  text-align: center; /* centering links */
-}
-
-.delete:hover {
-  background-color: #f44336;
-}
-
-.edit:hover {
-  background-color: #8bc34a;
-}
-
 /* Container for holding multiple event cards */
 .gameRoundsContainer {
   display: flex;
