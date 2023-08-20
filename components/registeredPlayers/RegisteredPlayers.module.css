@@ -1,3 +1,20 @@
 .container {
+}
 
+.materialList {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 20px 0;
+}
+
+.materialList li {
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.materialList li:hover {
+  background-color: #f5f5f5;
 }

@@ -44,7 +44,7 @@ export default async function gameRoundHandler(req, res) {
     });
 
     gameRound.extraDetails = JSON.parse(gameRound.extraDetails);
-    gameRound.registeredPlayersCount = registeredPlayersCount+3;
+    gameRound.registeredPlayersCount = registeredPlayersCount;
 
     res.json(gameRound);
   } else if (req.method === "PUT") {

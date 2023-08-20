@@ -32,17 +32,30 @@ export default async function gameRoundsHandler(req, res) {
     const eventId = req.query.eventId;
 
     let gameRounds;
-
     if (eventId) {
       gameRounds = await prisma.gameRound.findMany({
-        where: { eventId: eventId }, // Filter game rounds by eventId
+        where: { eventId: eventId },
+        include: {
+          PlayerRegistrations: {
+            where: { status: "registered" },
+            select: { id: true },
+          },
+        },
       });
     } else {
-      gameRounds = await prisma.gameRound.findMany();
+      gameRounds = await prisma.gameRound.findMany({
+        include: {
+          PlayerRegistrations: {
+            where: { status: "registered" },
+            select: { id: true },
+          },
+        },
+      });
     }
     // Parse the extraDetails for each gameRound
     const parsedGameRounds = gameRounds.map((gameRound) => ({
       ...gameRound,
+      registeredPlayersCount: gameRound.PlayerRegistrations.length,
       extraDetails: JSON.parse(gameRound.extraDetails),
     }));
 
