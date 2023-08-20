@@ -66,7 +66,7 @@ function EventPage({ eventId }) {
   };
 
   const handleAddRoundClick = () => {
-    router.push(`/rounds/add?eventIdTest=${eventId}`);
+    router.push(`/rounds/add?eventId=${eventId}`);
   };
 
   const { isLoading, loadedSession, user } = useSessionApp();

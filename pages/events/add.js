@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import { useRouter } from "next/router";
 import { env } from "@/helpers/env";
-import Card from "@/components/shared/card";
+import Card from "@/components/shared/card/card";
 import styles from "./EventAdd.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";

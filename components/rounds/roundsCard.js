@@ -6,7 +6,9 @@ import { env } from "@/helpers/env";
 import styles from "./RoundsCard.module.css";
 import SmallCard from "@/components/shared/smallCard/smallCard";
 import { useEffect, useState } from "react";
-import { getSession } from "next-auth/react";
+import useSessionApp from "@/hooks/useSessionApp";
+import { useApiRequest } from "@/hooks/useApiRequest";
+import { useRouter } from "next/router";
 
 // Utility function to trim long text
 function trimText(text, lengthLimit) {
@@ -29,20 +31,43 @@ function ContentElement(props) {
 }
 
 function GameRound({ round }) {
-  const [isLoading, setIsLoading] = useState(true); // Local state to toggle loading state
-  const [loadedSession, setLoadedSession] = useState(null); // Local state to store session data
-  const [user, setUser] = useState(null); // Local state to store user data
+  const router = useRouter();
+  const { isSessionLoading, loadedSession, user } = useSessionApp();
+
+  const {
+    fetchData: deleteGameRound,
+    data: deleteGameRoundData,
+    loading: deleteGameRoundLoading,
+    error: deleteGameRoundError,
+  } = useApiRequest(
+    `${env.BASE_API_URL}/gameRounds/${round.id}`, // Use environment variable
+    "DELETE",
+    false
+  );
+
+  // Handler for delete button click
+  const handleDelete = async () => {
+    try {
+      await deleteGameRound();
+    } catch (err) {
+      console.error("Failed to delete round:", err);
+    }
+  };
 
   useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        setLoadedSession(session);
-        setUser(session.user);
-      } else {
-        setIsLoading(false);
-      }
-    });
-  }, []);
+    if (
+      !deleteGameRoundLoading &&
+      !deleteGameRoundError &&
+      deleteGameRoundData
+    ) {
+      router.push(`${env.BASE_URL}/events`);
+    }
+  }, [deleteGameRoundLoading, deleteGameRoundError, deleteGameRoundData]);
+
+  // Handler for update button click
+  const handleUpdate = () => {
+    router.push(`${env.BASE_URL}/rounds/${round.id}/update`);
+  };
 
   return (
     <SmallCard>
@@ -69,9 +94,12 @@ function GameRound({ round }) {
           <b>System:</b> {round.gameSystem}
         </ContentElement>
       )}
-      <ContentElement>
-        <b>Maximalspieler:</b> {round.playerLimit}
-      </ContentElement>
+      {round.playerLimit > 0 && (
+        <ContentElement>
+          <b>Spieler Anzahl:</b> {round.registeredPlayersCount} von{" "}
+          {round.playerLimit}
+        </ContentElement>
+      )}
       {round.recommendedAge && (
         <ContentElement>
           <b>Forgeschalgenes Alter:</b> {round.recommendedAge}
@@ -86,7 +114,7 @@ function GameRound({ round }) {
         {loadedSession &&
           (user.id === round.gameMasterId || user.role == "admin") && (
             <button
-              // onClick={handleUpdate}
+              onClick={handleUpdate}
               className={`${styles.button} ${styles.edit}`}
             >
               <FontAwesomeIcon icon={faPenToSquare} size="lg" />
@@ -101,7 +129,7 @@ function GameRound({ round }) {
         {loadedSession &&
           (user.id === round.gameMasterId || user.role == "admin") && (
             <button
-              // onClick={handleDelete}
+              onClick={handleDelete}
               className={`${styles.button} ${styles.delete}`}
             >
               <FontAwesomeIcon icon={faTrashCan} size="lg" />
