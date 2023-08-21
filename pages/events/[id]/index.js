@@ -12,6 +12,7 @@ import { env } from "@/helpers/env";
 import Card from "@/components/shared/card/card";
 import ActionCard from "@/components/shared/actionCard/ActionCard";
 import useSessionApp from "@/hooks/useSessionApp";
+import ActionButtons from "@/components/shared/actionButton/actionButton";
 
 function Loading() {
   return (
@@ -110,20 +111,13 @@ function EventPage({ eventId }) {
         <h2 className={styles.title}>{event.name}</h2>
         {loadedSession &&
           (user.id === event.organizerId || user.role == "admin") && (
-            <div className={styles.links}>
-              <button
-                onClick={handleUpdate}
-                className={`${styles.button} ${styles.edit}`}
-              >
-                <FontAwesomeIcon icon={faPenToSquare} size="lg" />
-              </button>
-              <button
-                onClick={handleDelete}
-                className={`${styles.button} ${styles.delete}`}
-              >
-                <FontAwesomeIcon icon={faTrashCan} size="lg" />
-              </button>
-            </div>
+            <ActionButtons
+              loadedSession={loadedSession}
+              user={user}
+              ownerId={event.organizerId}
+              handleUpdate={handleUpdate}
+              handleDelete={handleDelete}
+            />
           )}
       </div>
       <div className={styles.content}>

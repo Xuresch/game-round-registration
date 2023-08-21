@@ -98,3 +98,7 @@
   margin: 1em;
   padding: 1em;
 }
+
+.textarea {
+  height: 7em;
+}

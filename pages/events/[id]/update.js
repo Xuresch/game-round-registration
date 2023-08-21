@@ -14,6 +14,7 @@ import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { getSession } from "next-auth/react";
 import prisma from "@/lib/prisma";
 import Select from "react-select";
+import ButtonGroup from "@/components/shared/actionButton/buttonGroupComponent";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -174,8 +175,8 @@ function UpdateEventPage({ eventId }) {
     data = {
       name: data.name,
       description: data.description,
-      startDate: data.startDate,
-      endDate: data.endDate,
+      startDate: formatISO(new Date(data.startDate)),
+      endDate: formatISO(new Date(data.endDate)),
       organizerId: data.organizerId,
       timeSlots: arrayToJson(data.timeSlots),
     };
@@ -266,13 +267,13 @@ function UpdateEventPage({ eventId }) {
                     options={userOptions}
                     isSearchable={true}
                     placeholder={`${
-                      selectedUser?.label || defaultOrganizer.label
-                    }: ${selectedUser?.value || defaultOrganizer.value}`}
+                      selectedUser?.label || defaultOrganizer?.label
+                    }: ${selectedUser?.value || defaultOrganizer?.value}`}
                     onChange={(option) => {
                       field.onChange(option.value);
                       setSelectedUser(option);
                     }}
-                    defaultValue={defaultOrganizer.label}
+                    defaultValue={defaultOrganizer?.label}
                   />
                 )}
               />
@@ -300,7 +301,10 @@ function UpdateEventPage({ eventId }) {
               control={control}
               name="description"
               render={({ field }) => (
-                <textarea className={styles.input} {...field} />
+                <textarea
+                  className={`${styles.input} ${styles.textarea}`}
+                  {...field}
+                />
               )}
             />
             {errors.description && (
@@ -402,17 +406,11 @@ function UpdateEventPage({ eventId }) {
               </fieldset>
             ))}
           </label>
-          <div className={styles.buttonWrapper}>
-            <button className={`${styles.button} ${styles.save}`} type="submit">
-              Event speichern
-            </button>
-            <button
-              onClick={handleCancel}
-              className={`${styles.button} ${styles.cancel}`}
-            >
-              Abbrechen
-            </button>
-          </div>
+          <ButtonGroup
+            handleCancel={handleCancel}
+            saveButtonText="Event aktualisieren"
+            cancelButtonText="Abbrechen"
+          />
         </form>
       </div>
     </Card>
