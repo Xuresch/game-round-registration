@@ -105,11 +105,11 @@ function GameRound({ round }) {
           <b>Forgeschalgenes Alter:</b> {round.recommendedAge}
         </ContentElement>
       )}
-      {round.extraDetails && (
+      {/* {round.extraDetails && (
         <ContentElement>
           <b>Zusätzliche Deteils:</b> {round.extraDetails}
         </ContentElement>
-      )}
+      )} */}
       <div className={styles.links}>
         {loadedSession &&
           (user.id === round.gameMasterId || user.role == "admin") && (

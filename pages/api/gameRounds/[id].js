@@ -15,15 +15,16 @@ const schema = Joi.object({
   endTime: Joi.string().isoDate(),
   playerLimit: Joi.number().integer(),
   waitingList: Joi.boolean(),
-  extraDetails: Joi.object().pattern(
-    Joi.string(),
-    Joi.alternatives().try(
-      Joi.string(),
-      Joi.number(),
-      Joi.boolean(),
-      Joi.object()
-    )
-  ),
+  extraDetails: Joi.string().allow(null),
+  // extraDetails: Joi.object().pattern(
+  //   Joi.string(),
+  //   Joi.alternatives().try(
+  //     Joi.string(),
+  //     Joi.number(),
+  //     Joi.boolean(),
+  //     Joi.object()
+  //   )
+  // ),
 });
 
 export default async function gameRoundHandler(req, res) {

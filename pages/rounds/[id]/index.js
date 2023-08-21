@@ -33,6 +33,9 @@ function DeteilRoundPage({ round, gameMaster, user }) {
   const [deleteGameRoundLoading, setDeleteGameRoundLoading] = useState(false);
   const [deleteGameRoundData, setDeleteGameRoundData] = useState(null);
   const [deleteGameRoundError, setDeleteGameRoundError] = useState(null);
+  const [registeredPlayersCount, setRegisteredPlayersCount] = useState(
+    round.registeredPlayersCount
+  );
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -49,6 +52,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
     await deletePlayerRegistration(playerRegistration.id);
     setPlayerRegistration(null);
     promoteOldestWaitingPlayer(round);
+    setRegisteredPlayersCount((prevCount) => prevCount - 1);
   };
 
   const handleRegister = async () => {
@@ -57,6 +61,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
       return;
     }
     await registerPlayer(user.id, round.id, "registered");
+    setRegisteredPlayersCount((prevCount) => prevCount + 1);
   };
 
   const handleAddToWaitlist = async () => {
@@ -143,13 +148,16 @@ function DeteilRoundPage({ round, gameMaster, user }) {
           label="Spielleiter"
           value={gameMaster.data.userName}
         />
-        <ActionButtons
-          loadedSession={loadedSession}
-          user={user}
-          ownerId={round.gameMasterId}
-          handleUpdate={handleUpdate}
-          handleDelete={handleDelete}
-        />
+        {loadedSession &&
+          (user.id === round.gameMasterId || user.role == "admin") && (
+            <ActionButtons
+              loadedSession={loadedSession}
+              user={user}
+              ownerId={round.gameMasterId}
+              handleUpdate={handleUpdate}
+              handleDelete={handleDelete}
+            />
+          )}
       </div>
       <div className={styles.content}>
         <div className={styles.informations}>
@@ -169,7 +177,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
           {round.playerLimit > 0 && (
             <InformationItem
               label="Spieler Anzahl"
-              value={`${round.registeredPlayersCount} von ${round.playerLimit}`}
+              value={`${registeredPlayersCount} von ${round.playerLimit}`}
             />
           )}
           <InformationItem label="Beginn" value={`${displayStartDate} Uhr`} />
