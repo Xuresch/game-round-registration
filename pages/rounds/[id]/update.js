@@ -13,6 +13,7 @@ import { getSession } from "next-auth/react";
 
 // Date utilities
 import { formatISO } from "date-fns";
+import { DateTime, Settings } from "luxon";
 
 // API and Networking
 import {
@@ -378,24 +379,29 @@ function UpdateGameRoundPage({ roundId, gameMaster, user, eventTimeSlots }) {
               </label>
             </>
           )}
-          <label className={styles.label}>
-            waitingList:
-            <Controller
-              control={control}
-              name="waitingList"
-              render={({ field }) => (
-                <input
-                  type="checkbox"
-                  checked={field.value}
-                  className={styles.input}
-                  onChange={(e) => field.onChange(e.target.checked)}
-                />
+          <div className={styles.toggleWithLabel}>
+            <span className={styles.toggleLabelText}>Warteliste</span>
+            <label className={styles.toggleContainer}>
+              <Controller
+                control={control}
+                name="waitingList"
+                render={({ field }) => (
+                  <>
+                    <input
+                      type="checkbox"
+                      className={styles.toggleInput}
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                    />
+                    <span className={styles.toggleSlider}></span>
+                  </>
+                )}
+              />
+              {errors?.waitingList && (
+                <p className={styles.error}>This field is required</p>
               )}
-            />
-            {errors?.waitingList && (
-              <p className={styles.error}>This field is required</p>
-            )}
-          </label>
+            </label>
+          </div>
           {/* <label className={styles.label}>
             extraDetails:
             <Controller
