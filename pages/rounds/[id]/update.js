@@ -246,7 +246,7 @@ function UpdateGameRoundPage({ roundId, gameMaster, user, eventTimeSlots }) {
             )}
           </label>
           <label className={styles.label}>
-            Description:
+            Beschreibung:
             <Controller
               control={control}
               name="description"
@@ -262,7 +262,7 @@ function UpdateGameRoundPage({ roundId, gameMaster, user, eventTimeSlots }) {
             )}
           </label>
           <label className={styles.label}>
-            gameType:
+            Spieltyp:
             <Controller
               control={control}
               name="gameType"
@@ -275,7 +275,7 @@ function UpdateGameRoundPage({ roundId, gameMaster, user, eventTimeSlots }) {
             )}
           </label>
           <label className={styles.label}>
-            gameSystem:
+            Spiel System:
             <Controller
               control={control}
               name="gameSystem"
@@ -288,7 +288,7 @@ function UpdateGameRoundPage({ roundId, gameMaster, user, eventTimeSlots }) {
             )}
           </label>
           <label className={styles.label}>
-            genre:
+            Genre:
             <Controller
               control={control}
               name="genre"
@@ -301,12 +301,12 @@ function UpdateGameRoundPage({ roundId, gameMaster, user, eventTimeSlots }) {
             )}
           </label>
           <label className={styles.label}>
-            recommendedAge:
+            Vorgeschlagenes Alter:
             <Controller
               control={control}
               name="recommendedAge"
               render={({ field }) => (
-                <input className={styles.input} {...field} />
+                <input className={styles.input} {...field} type="number" />
               )}
             />
             {errors?.recommendedAge && (
@@ -314,12 +314,12 @@ function UpdateGameRoundPage({ roundId, gameMaster, user, eventTimeSlots }) {
             )}
           </label>
           <label className={styles.label}>
-            playerLimit:
+            Spielerlimit:
             <Controller
               control={control}
               name="playerLimit"
               render={({ field }) => (
-                <input className={styles.input} {...field} />
+                <input className={styles.input} {...field} type="number" />
               )}
             />
             {errors?.playerLimit && (
@@ -328,7 +328,7 @@ function UpdateGameRoundPage({ roundId, gameMaster, user, eventTimeSlots }) {
           </label>
           {hasTimeSlots ? (
             <label className={styles.label}>
-              Timeslots:
+              Zeitraum:
               <Controller
                 control={control}
                 name="timeSlot"
@@ -336,7 +336,7 @@ function UpdateGameRoundPage({ roundId, gameMaster, user, eventTimeSlots }) {
                   field.onChange(option.value);
                 }}
                 render={({ field }) => (
-                  <select {...field}>
+                  <select className={styles.dropdown} {...field}>
                     {Object.values(eventTimeSlots).map((slot, index) => (
                       <option key={index} value={`${slot.start}-${slot.end}`}>
                         {`Slot ${index + 1}: von ${slot.start} bis ${slot.end}`}
