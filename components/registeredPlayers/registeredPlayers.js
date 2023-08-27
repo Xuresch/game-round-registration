@@ -35,12 +35,16 @@ function RegisteredPlayers({ gameRoundId, isLoading }) {
 
   return (
     <div className={styles.container}>
-      <h3>Registrierte Spieler</h3>
-      <ul className={styles.materialList}>
-        {players.map((player) => (
-          <li key={player.id}>{player.Player.userName}</li>
-        ))}
-      </ul>
+      {players.length > 0 && (
+        <>
+          <h3>Registrierte Spieler</h3>
+          <ul className={styles.materialList}>
+            {players.map((player) => (
+              <li key={player.id}>{player.Player.userName}</li>
+            ))}
+          </ul>
+        </>
+      )}
 
       {waitingList.length > 0 && (
         <>

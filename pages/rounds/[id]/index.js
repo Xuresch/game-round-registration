@@ -1,6 +1,5 @@
 // External libraries
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 // Next.js related
 import { getSession } from "next-auth/react";
@@ -17,14 +16,14 @@ import {
   promoteOldestWaitingPlayer,
   registerPlayer,
 } from "@/lib/rounds/playerRegistrationService";
-import { deleteGameRound } from "@/lib/rounds/roundsService";
+import { deleteGameRound, getGameRound } from "@/lib/rounds/roundsService";
 
 // Styles
 import styles from "./Round.module.css";
 import { formatRoundDates } from "@/helpers/dateFormatter";
 import ActionButtons from "@/components/shared/actionButton/actionButton";
 import InformationItem from "@/components/shared/informationItem/informationItem";
-import { getGenre } from "@/lib/rounds/genreService";
+import { getUser } from "@/lib/user/userService";
 
 function DeteilRoundPage({ round, gameMaster, user }) {
   const router = useRouter();
@@ -167,6 +166,16 @@ function DeteilRoundPage({ round, gameMaster, user }) {
             value={capitalizeFirstLetter(round.gameType)}
           />
           <InformationItem label="System" value={round.gameSystem} />
+          <div className={styles.genresContainer}>
+            <label>
+              <b>Genres:</b>
+            </label>
+            <div className={styles.genreContainer}>
+              {round.genres.map((genre) => (
+                <span key={genre.id}>{genre.value}</span>
+              ))}
+            </div>
+          </div>
           <InformationItem label="Genre" value={round.genre} />
           <InformationItem
             label="Altersempfehlung"
@@ -212,26 +221,10 @@ export async function getServerSideProps(context) {
     const sessionGet = await getSession({ req: context.req });
     const user = sessionGet?.user || null;
 
-    // Fetch round details
-    const roundRes = await axios.get(`${env.BASE_API_URL}/gameRounds/${id}`);
-    const round = roundRes.data;
+    const round = await getGameRound(id);
 
     // Fetch gameMaster details
-    const gameMasterRes = await axios.get(
-      `${env.BASE_API_URL}/users/${round.gameMasterId}`
-    );
-    const gameMaster = gameMasterRes.data;
-
-    const genres = await getGenre();
-
-    const splitRoundGenres = round.genres.split(",");
-
-    const genreDisplayValues = splitRoundGenres.map((code) => {
-      const genre = genres.find((g) => g.code === code.trim());
-      return genre ? genre.value : code; // Fallback to the code if no matching genre is found
-    });
-
-    round.genre = genreDisplayValues.join(", ");
+    const gameMaster = await getUser(round.gameMasterId);
 
     return {
       props: {

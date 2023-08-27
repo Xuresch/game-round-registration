@@ -2,8 +2,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import useSessionApp from "@/hooks/useSessionApp";
-import { useForm, Controller } from "react-hook-form";
-import Select from "react-select";
 
 // Data Validation and Schema
 import * as Yup from "yup";
@@ -13,7 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { getSession } from "next-auth/react";
 
 // Date utilities
-import { compareAsc, formatISO, set } from "date-fns";
+import { formatISO } from "date-fns";
 
 // API and Networking
 import {
@@ -35,10 +33,6 @@ import styles from "./UpdateRound.module.css";
 import ButtonGroup from "@/components/shared/actionButton/buttonGroupComponent";
 import { getGenre } from "@/lib/rounds/genreService";
 import MultiSelectModal from "@/components/shared/modal/multiSelectModal";
-import { is, ro } from "date-fns/locale";
-import { getAbsoluteFSPath } from "swagger-ui-dist";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faX } from "@fortawesome/free-solid-svg-icons";
 import TextInput from "@/components/shared/intput/textInput";
 import TextArea from "@/components/shared/intput/textArea";
 import Dropdown from "@/components/shared/intput/dropdown";
@@ -46,7 +40,6 @@ import NumberInput from "@/components/shared/intput/numberInput";
 import Togglebox from "@/components/shared/intput/togglebox";
 import GenresFormField from "@/components/rounds/genresFormField";
 import TimeSlotSelector from "@/components/rounds/timeSlotSelector";
-import DateTimePicker from "@/components/shared/intput/dateTimePicker";
 import StartTimeEndTimePicker from "@/components/rounds/startTimeEndTimePicker";
 
 // Define validation schema with Yup
@@ -72,11 +65,6 @@ function UpdateGameRoundPage({
 }) {
   const router = useRouter();
 
-  console.log("eventTimeSlots", eventTimeSlots);
-
-  // const hasTimeSlots =
-  //   eventTimeSlots && Object.values(eventTimeSlots)[0].start !== "";
-
   const { isSessionLoading, loadedSession } = useSessionApp();
   const [deleteGameRoundLoading, setDeleteGameRoundLoading] = useState(false);
   const [deleteGameRoundData, setDeleteGameRoundData] = useState(null);
@@ -85,18 +73,12 @@ function UpdateGameRoundPage({
   const [isModalOpen, setModalOpen] = useState(false);
 
   const [selectedGenres, setSelectedGenres] = useState([]);
-
   const [gameRound, setGameRound] = useState([]);
   const [gameRoundName, setGameRoundName] = useState("");
-
   const [timeSlots, setTimeSlots] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-
-  const handleSubmit = (data) => {
-    console.log(data);
-  };
 
   useEffect(() => {
     async function fetchGameRound() {
@@ -107,10 +89,7 @@ function UpdateGameRoundPage({
 
       const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       // Convert the dates to the user's timezone and format them
-      const startTime = formatToUserTimezone(
-        gameRound.startTime,
-        userTimezone
-      );
+      const startTime = formatToUserTimezone(gameRound.startTime, userTimezone);
       const endTime = formatToUserTimezone(gameRound.endTime, userTimezone);
 
       setStartTime(startTime);
@@ -133,77 +112,6 @@ function UpdateGameRoundPage({
     fetchGameRound();
   }, [roundId]);
 
-  console.log("gameRound:", gameRound);
-  console.log("stratTime:", startTime);
-  console.log("endTime:", endTime);
-
-  // console.log(selectedGenres);
-  // console.log(genres);
-
-  // useEffect(() => {
-  //   if (gameRound) {
-  //     const formattedGameRound = { ...gameRound };
-
-  //     // Get user's timezone
-  //     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  //     // Convert the dates to the user's timezone and format them
-  //     formattedGameRound.startTime = formatToUserTimezone(
-  //       gameRound.startTime,
-  //       userTimezone
-  //     );
-  //     formattedGameRound.endTime = formatToUserTimezone(
-  //       gameRound.endTime,
-  //       userTimezone
-  //     );
-
-  //     if (
-  //       eventTimeSlots &&
-  //       formattedGameRound.startTime &&
-  //       formattedGameRound.endTime
-  //     ) {
-  //       formattedGameRound.timeSlot = `${formattedGameRound.startTime}-${formattedGameRound.endTime}`;
-  //     }
-
-  //     reset(formattedGameRound); // Reset form with the fetched data
-  //   }
-  // }, [gameRound, reset]);
-
-  // const onSubmit = async (data) => {
-  //   console.log(data);
-  //   if (data.timeSlot) {
-  //     const regex =
-  //       /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})-(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/;
-  //     const match = data.timeSlot.match(regex);
-  //     data.startTime = match[1];
-  //     data.endTime = match[2];
-  //   }
-
-  //   const payload = {
-  //     eventId: data.eventId,
-  //     gameMasterId: data.gameMasterId,
-  //     name: data.name,
-  //     description: data.description,
-  //     gameTypeString: data.gameTypeString,
-  //     gameSystem: data.gameSystem,
-  //     genres: data.genres.map((genre) => genre.value).join(","),
-  //     // genres: data.genres.join(","),
-  //     recommendedAge: data.recommendedAge,
-  //     startTime: formatISO(new Date(data.startTime)),
-  //     endTime: formatISO(new Date(data.endTime)),
-  //     playerLimit: data.playerLimit,
-  //     waitingList: data.waitingList,
-  //     extraDetails: data.extraDetails,
-  //   };
-
-  //   try {
-  //     await updateGameRound(gameRound?.id, payload);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  //   // router.push(`${env.BASE_URL}/rounds/${roundId}`);
-  // };
-
   const onSubmit = async (data) => {
     data.preventDefault();
 
@@ -211,8 +119,8 @@ function UpdateGameRoundPage({
       const regex =
         /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})-(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/;
       const match = selectedTimeSlot.match(regex);
-      gameRound.startTime = match[1];
-      gameRound.endTime = match[2];
+      gameRound.startTime = formatISO(new Date(match[1]));
+      gameRound.endTime = formatISO(new Date(match[2]));
     } else {
       gameRound.startTime = formatISO(new Date(startTime));
       gameRound.endTime = formatISO(new Date(endTime));
@@ -235,6 +143,8 @@ function UpdateGameRoundPage({
     };
 
     console.log(payload);
+    updateGameRound(roundId, payload);
+    router.push(`${env.BASE_URL}/rounds/${roundId}`);
   };
 
   // Handler for delete button click
@@ -305,22 +215,26 @@ function UpdateGameRoundPage({
       </div>
       <div className={styles.content}>
         <form className={styles.form} onSubmit={onSubmit}>
-          <TextInput
-            label="UUID"
-            value={gameRound.id}
-            readOnly={true}
-            disable={true}
-          />
-          <TextInput
-            label="Event ID"
-            value={gameRound.eventId}
-            disable={true}
-          />
-          <TextInput
-            label="Spielleiter ID"
-            value={gameRound.gameMasterId}
-            disable={true}
-          />
+          {loadedSession && user.role == "admin" && (
+            <>
+              <TextInput
+                label="UUID"
+                value={gameRound.id}
+                readOnly={true}
+                disable={true}
+              />
+              <TextInput
+                label="Event ID"
+                value={gameRound.eventId}
+                disable={true}
+              />
+              <TextInput
+                label="Spielleiter ID"
+                value={gameRound.gameMasterId}
+                disable={true}
+              />
+            </>
+          )}
           <TextInput
             label="Title"
             value={gameRound.name}
@@ -426,8 +340,8 @@ export async function getServerSideProps(context) {
     }
 
     const genres = await getGenre();
-    console.log(genres);
-    console.log(round);
+    // console.log(genres);
+    // console.log(round);
 
     if (user?.id === round.gameMasterId || user?.role == "admin") {
       return {

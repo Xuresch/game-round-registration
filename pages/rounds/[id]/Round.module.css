@@ -109,3 +109,16 @@
   background-color: #ccc;
   color: #607d8b;
 }
+
+.genresContainer {
+  display: flex;
+  font-size: 0.9em;
+  color: rgba(0, 0, 0, 0.6);
+  line-height: 20px;
+}
+
+.genreContainer {
+  display: flex;
+  flex-direction: column;
+  margin-left: 4px;
+}
