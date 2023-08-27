@@ -13,6 +13,8 @@ import Card from "@/components/shared/card/card";
 import ActionCard from "@/components/shared/actionCard/ActionCard";
 import useSessionApp from "@/hooks/useSessionApp";
 import ActionButtons from "@/components/shared/actionButton/actionButton";
+import { getEventGameRounds } from "@/lib/rounds/roundsService";
+import { getGenre } from "@/lib/rounds/genreService";
 
 function Loading() {
   return (
@@ -35,18 +37,18 @@ function Error({ title, message }) {
   );
 }
 
-function EventPage({ eventId }) {
+function EventPage({ eventId, rounds }) {
   const router = useRouter();
   const {
     data: event,
     loading: eventLoading,
     error: eventError,
   } = useApiRequest(`${env.BASE_API_URL}/events/${eventId}`);
-  const {
-    data: rounds,
-    loading: roundsLoading,
-    error: roundsError,
-  } = useApiRequest(`${env.BASE_API_URL}/gameRounds?eventId=${eventId}`);
+  // const {
+  //   data: rounds,
+  //   loading: roundsLoading,
+  //   error: roundsError,
+  // } = useApiRequest(`${env.BASE_API_URL}/gameRounds?eventId=${eventId}`);
   const {
     fetchData: deleteEvent,
     data: deleteEventData,
@@ -78,7 +80,7 @@ function EventPage({ eventId }) {
     }
   }, [deleteEventLoading, deleteEventError, deleteEventData]);
 
-  if (eventLoading || roundsLoading) {
+  if (eventLoading) {
     return <Loading />;
   }
 
@@ -86,10 +88,6 @@ function EventPage({ eventId }) {
     console.log(eventError.response.data);
     const eventErrorMessage = `${eventError.message}: ${eventError.response.data.message}`;
     return <Error message={eventErrorMessage} title="event" />;
-  }
-
-  if (roundsError) {
-    return <Error message={roundsError.message} title="rounds" />;
   }
 
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -161,8 +159,23 @@ function EventPage({ eventId }) {
 export async function getServerSideProps(context) {
   const eventId = context.params.id;
 
+  const rounds = await getEventGameRounds(eventId);
+
+  const genres = await getGenre();
+
+  for (let round of rounds) {
+    const splitRoundGenres = round.genres.split(",");
+
+    const genreDisplayValues = splitRoundGenres.map((code) => {
+      const genre = genres.find((g) => g.code === code.trim());
+      return genre ? genre.value : code; // Fallback to the code if no matching genre is found
+    });
+
+    round.genre = genreDisplayValues.join(", ");
+  }
+
   return {
-    props: { eventId },
+    props: { eventId, rounds },
   };
 }
 

@@ -1,0 +1,52 @@
+/* The container for the modal content */
+.modalContent {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 500px;
+}
+
+/* The container for the options */
+.optionsContainer {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+/* The container for a single option */
+.optionContainer {
+  margin: 0.125em 0;
+  display: flex;
+  align-items: center;
+}
+
+/* The checkbox for an option */
+.optionCheckbox {
+  margin-right: 10px;
+}
+
+/* The label for an option */
+.optionLabel {
+  flex-grow: 1;
+}
+
+/* The button to close the modal */
+.doneButton {
+  background-color: #fff;
+  color: #607d8b;
+  text-decoration: none;
+  margin-top: 1em;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+  padding: 10px 16px;
+  border: 0px solid #607d8b;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  height: 42px;
+}
+
+.doneButton:hover {
+  background-color: #8bc34a;
+}

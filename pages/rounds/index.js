@@ -13,26 +13,12 @@ import { useEffect, useState } from "react";
 import { getSession } from "next-auth/react";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import ActionCard from "@/components/shared/actionCard/ActionCard";
-
-// export async function getServerSideProps() {
-//   const res = await axios.get(`${env.BASE_API_URL}/gameRounds`);
-//   const gameRounds = res.data;
-
-//   return {
-//     props: { gameRounds },
-//   };
-// }
+import { getAllGameRounds } from "@/lib/rounds/roundsService";
+import { getGenre } from "@/lib/rounds/genreService";
 
 // Main component to render the list of events
-function RoundPage() {
+function RoundPage({ rounds }) {
   const router = useRouter();
-
-  // console.log(`${env.BASE_API_URL}/gameRounds`);
-  const {
-    data: rounds,
-    loading: roundsLoading,
-    error: roundsError,
-  } = useApiRequest(`${env.BASE_API_URL}/gameRounds`);
 
   const handleAddRoundClick = () => {
     router.push("/rounds/add");
@@ -71,3 +57,36 @@ function RoundPage() {
 }
 
 export default RoundPage;
+
+export async function getServerSideProps(context) {
+  try {
+    // Fetch round details
+    const rounds = await getAllGameRounds();
+
+    console.log(rounds);
+
+    const genres = await getGenre();
+
+    for (let round of rounds) {
+      const splitRoundGenres = round.genres.split(",");
+
+      const genreDisplayValues = splitRoundGenres.map((code) => {
+        const genre = genres.find((g) => g.code === code.trim());
+        return genre ? genre.value : code; // Fallback to the code if no matching genre is found
+      });
+
+      round.genre = genreDisplayValues.join(", ");
+    }
+
+    return {
+      props: {
+        rounds,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return {
+      notFound: true, // This will return a 404 page
+    };
+  }
+}
