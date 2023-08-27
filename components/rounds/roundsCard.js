@@ -5,7 +5,7 @@ import Link from "next/link";
 import { env } from "@/helpers/env";
 import styles from "./RoundsCard.module.css";
 import SmallCard from "@/components/shared/smallCard/smallCard";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useSessionApp from "@/hooks/useSessionApp";
 import { useApiRequest } from "@/hooks/useApiRequest";
 import { useRouter } from "next/router";
@@ -81,10 +81,18 @@ function GameRound({ round }) {
           {format(new Date(round.endTime), "HH:mm")} Uhr
         </ContentElement>
       </div>
-      <ContentElement>
-        <b>Genre:</b>{" "}
-        {round.genre.charAt(0).toUpperCase() + round.genre.slice(1)}
-      </ContentElement>
+
+      <div className={styles.genresContainer}>
+        <label>
+          <b>Genres:</b>
+        </label>
+        <div className={styles.genreContainer}>
+          {round.GameRoundGenre.map((genre) => (
+            <span key={genre.genre.id}>{genre.genre.value} </span>
+          ))}
+        </div>
+      </div>
+
       <ContentElement>
         <b>Type:</b>{" "}
         {round.gameType.charAt(0).toUpperCase() + round.gameType.slice(1)}

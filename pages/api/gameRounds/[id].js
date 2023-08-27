@@ -3,12 +3,12 @@ import Joi from "joi";
 import { validate } from "@/helpers/validate";
 
 const schema = Joi.object({
-  eventId: Joi.string(),
+  eventId: Joi.string().allow(null),
   gameMasterId: Joi.string(),
   name: Joi.string(),
   description: Joi.string(),
   gameType: Joi.string(),
-  gameSystem: Joi.string(),
+  gameSystem: Joi.string().allow(null),
   genres: Joi.string(),
   recommendedAge: Joi.number().integer(),
   startTime: Joi.string().isoDate(),

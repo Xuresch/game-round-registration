@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./Event.module.css";
 import GameRound from "@/components/rounds/roundsCard";
@@ -14,7 +12,6 @@ import ActionCard from "@/components/shared/actionCard/ActionCard";
 import useSessionApp from "@/hooks/useSessionApp";
 import ActionButtons from "@/components/shared/actionButton/actionButton";
 import { getEventGameRounds } from "@/lib/rounds/roundsService";
-import { getGenre } from "@/lib/rounds/genreService";
 
 function Loading() {
   return (
@@ -44,11 +41,7 @@ function EventPage({ eventId, rounds }) {
     loading: eventLoading,
     error: eventError,
   } = useApiRequest(`${env.BASE_API_URL}/events/${eventId}`);
-  // const {
-  //   data: rounds,
-  //   loading: roundsLoading,
-  //   error: roundsError,
-  // } = useApiRequest(`${env.BASE_API_URL}/gameRounds?eventId=${eventId}`);
+
   const {
     fetchData: deleteEvent,
     data: deleteEventData,
@@ -160,19 +153,6 @@ export async function getServerSideProps(context) {
   const eventId = context.params.id;
 
   const rounds = await getEventGameRounds(eventId);
-
-  const genres = await getGenre();
-
-  for (let round of rounds) {
-    const splitRoundGenres = round.genres.split(",");
-
-    const genreDisplayValues = splitRoundGenres.map((code) => {
-      const genre = genres.find((g) => g.code === code.trim());
-      return genre ? genre.value : code; // Fallback to the code if no matching genre is found
-    });
-
-    round.genre = genreDisplayValues.join(", ");
-  }
 
   return {
     props: { eventId, rounds },

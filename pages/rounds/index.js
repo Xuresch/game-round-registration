@@ -2,19 +2,13 @@
 import styles from "./GameRound.module.css";
 // import EventsCard from "@/components/events/eventsCard";
 
-// Import axios for making HTTP requests
-import axios from "axios";
-
 // Import environment helper to get environment variables
-import { env } from "@/helpers/env";
 import GameRound from "@/components/rounds/roundsCard";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { getSession } from "next-auth/react";
-import { useApiRequest } from "@/hooks/useApiRequest";
 import ActionCard from "@/components/shared/actionCard/ActionCard";
 import { getAllGameRounds } from "@/lib/rounds/roundsService";
-import { getGenre } from "@/lib/rounds/genreService";
 
 // Main component to render the list of events
 function RoundPage({ rounds }) {
@@ -62,21 +56,6 @@ export async function getServerSideProps(context) {
   try {
     // Fetch round details
     const rounds = await getAllGameRounds();
-
-    console.log(rounds);
-
-    const genres = await getGenre();
-
-    for (let round of rounds) {
-      const splitRoundGenres = round.genres.split(",");
-
-      const genreDisplayValues = splitRoundGenres.map((code) => {
-        const genre = genres.find((g) => g.code === code.trim());
-        return genre ? genre.value : code; // Fallback to the code if no matching genre is found
-      });
-
-      round.genre = genreDisplayValues.join(", ");
-    }
 
     return {
       props: {

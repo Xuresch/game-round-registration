@@ -37,6 +37,13 @@ export default async function gameRoundsHandler(req, res) {
       gameRounds = await prisma.gameRound.findMany({
         where: { eventId: eventId },
         include: {
+          GameRoundGenre: {
+            include: {
+              genre: {
+                select: { id: true, value: true },
+              },
+            },
+          },
           PlayerRegistrations: {
             where: { status: "registered" },
             select: { id: true },
@@ -46,6 +53,13 @@ export default async function gameRoundsHandler(req, res) {
     } else {
       gameRounds = await prisma.gameRound.findMany({
         include: {
+          GameRoundGenre: {
+            include: {
+              genre: {
+                select: { id: true, value: true },
+              },
+            },
+          },
           PlayerRegistrations: {
             where: { status: "registered" },
             select: { id: true },
