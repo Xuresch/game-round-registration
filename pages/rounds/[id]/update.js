@@ -35,7 +35,7 @@ import styles from "./UpdateRound.module.css";
 import ButtonGroup from "@/components/shared/actionButton/buttonGroupComponent";
 import { getGenre } from "@/lib/rounds/genreService";
 import MultiSelectModal from "@/components/shared/modal/multiSelectModal";
-import { is } from "date-fns/locale";
+import { is, ro } from "date-fns/locale";
 import { getAbsoluteFSPath } from "swagger-ui-dist";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
@@ -45,6 +45,9 @@ import Dropdown from "@/components/shared/intput/dropdown";
 import NumberInput from "@/components/shared/intput/numberInput";
 import Togglebox from "@/components/shared/intput/togglebox";
 import GenresFormField from "@/components/rounds/genresFormField";
+import TimeSlotSelector from "@/components/rounds/timeSlotSelector";
+import DateTimePicker from "@/components/shared/intput/dateTimePicker";
+import StartTimeEndTimePicker from "@/components/rounds/startTimeEndTimePicker";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -69,8 +72,10 @@ function UpdateGameRoundPage({
 }) {
   const router = useRouter();
 
-  const hasTimeSlots =
-    eventTimeSlots && Object.values(eventTimeSlots)[0].start !== "";
+  console.log("eventTimeSlots", eventTimeSlots);
+
+  // const hasTimeSlots =
+  //   eventTimeSlots && Object.values(eventTimeSlots)[0].start !== "";
 
   const { isSessionLoading, loadedSession } = useSessionApp();
   const [deleteGameRoundLoading, setDeleteGameRoundLoading] = useState(false);
@@ -81,29 +86,13 @@ function UpdateGameRoundPage({
 
   const [selectedGenres, setSelectedGenres] = useState([]);
 
-  // const { reset, register, handleSubmit, control, errors, watch, setValue } =
-  //   useForm({
-  //     resolver: yupResolver(schema),
-  //     defaultValues: {
-  //       id: "",
-  //       eventId: "",
-  //       gameMasterId: "",
-  //       name: "",
-  //       description: "",
-  //       gameType: "",
-  //       gameSystem: "",
-  //       genres: [],
-  //       recommendedAge: "",
-  //       timeSlot: null,
-  //       startTime: "",
-  //       endTime: "",
-  //       playerLimit: 0,
-  //       waitingList: false,
-  //       extraDetails: null,
-  //     },
-  //   });
   const [gameRound, setGameRound] = useState([]);
   const [gameRoundName, setGameRoundName] = useState("");
+
+  const [timeSlots, setTimeSlots] = useState(null);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
   const handleSubmit = (data) => {
     console.log(data);
@@ -115,9 +104,38 @@ function UpdateGameRoundPage({
       setGameRound(gameRound);
       setSelectedGenres(gameRound.genres);
       setGameRoundName(gameRound.name);
+
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      // Convert the dates to the user's timezone and format them
+      const startTime = formatToUserTimezone(
+        gameRound.startTime,
+        userTimezone
+      );
+      const endTime = formatToUserTimezone(gameRound.endTime, userTimezone);
+
+      setStartTime(startTime);
+      setEndTime(endTime);
+
+      if (eventTimeSlots) {
+        const timeSlotsArray = Object.keys(eventTimeSlots).map((key) => {
+          const { start, end } = eventTimeSlots[key];
+          return {
+            value: `${start}-${end}`,
+            label: `Von ${formatDateTime(start)} bis ${formatDateTime(end)}`,
+          };
+        });
+
+        setTimeSlots(timeSlotsArray);
+        setSelectedTimeSlot(`${startTime}-${endTime}`);
+      }
     }
+
     fetchGameRound();
   }, [roundId]);
+
+  console.log("gameRound:", gameRound);
+  console.log("stratTime:", startTime);
+  console.log("endTime:", endTime);
 
   // console.log(selectedGenres);
   // console.log(genres);
@@ -188,7 +206,17 @@ function UpdateGameRoundPage({
 
   const onSubmit = async (data) => {
     data.preventDefault();
-    console.log(data);
+
+    if (selectedTimeSlot) {
+      const regex =
+        /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})-(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/;
+      const match = selectedTimeSlot.match(regex);
+      gameRound.startTime = match[1];
+      gameRound.endTime = match[2];
+    } else {
+      gameRound.startTime = formatISO(new Date(startTime));
+      gameRound.endTime = formatISO(new Date(endTime));
+    }
 
     const payload = {
       eventId: gameRound.eventId,
@@ -254,8 +282,6 @@ function UpdateGameRoundPage({
       selectedGenres.filter((genre) => genre.code !== genreToDelete.code)
     );
   }
-
-  console.log("gameRound:", gameRound);
 
   return (
     <Card>
@@ -345,7 +371,23 @@ function UpdateGameRoundPage({
               setGameRound({ ...gameRound, playerLimit: event.target.value })
             }
           />
-          <div>Timeslot and datepicer</div>
+          {timeSlots?.length > 0 ? (
+            <TimeSlotSelector
+              timeSlots={timeSlots}
+              selectedTimeSlot={selectedTimeSlot}
+              onSelectTimeSlot={(event) =>
+                setSelectedTimeSlot(event.target.value)
+              }
+            />
+          ) : (
+            <StartTimeEndTimePicker
+              startTime={startTime}
+              endTime={endTime}
+              onSelectStartTime={(event) => setStartTime(event.target.value)}
+              onSelectEndTime={(event) => setEndTime(event.target.value)}
+            />
+          )}
+
           <Togglebox
             label="Warteliste"
             checked={gameRound.waitingList}
@@ -377,8 +419,11 @@ export async function getServerSideProps(context) {
     // Fetch gameMaster details
     const gameMaster = await getUser(round.gameMasterId);
 
-    const event = await getEvent(round.eventId);
-    const eventTimeSlots = event.timeSlots;
+    let eventTimeSlots = null;
+    if (round.eventId != null) {
+      const event = await getEvent(round.eventId);
+      eventTimeSlots = event.timeSlots;
+    }
 
     const genres = await getGenre();
     console.log(genres);
