@@ -24,6 +24,7 @@ import styles from "./Round.module.css";
 import { formatRoundDates } from "@/helpers/dateFormatter";
 import ActionButtons from "@/components/shared/actionButton/actionButton";
 import InformationItem from "@/components/shared/informationItem/informationItem";
+import { getGenre } from "@/lib/rounds/genreService";
 
 function DeteilRoundPage({ round, gameMaster, user }) {
   const router = useRouter();
@@ -166,10 +167,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
             value={capitalizeFirstLetter(round.gameType)}
           />
           <InformationItem label="System" value={round.gameSystem} />
-          <InformationItem
-            label="Genre"
-            value={capitalizeFirstLetter(round.genre)}
-          />
+          <InformationItem label="Genre" value={round.genre} />
           <InformationItem
             label="Altersempfehlung"
             value={`${round.recommendedAge} Jahre`}
@@ -223,6 +221,17 @@ export async function getServerSideProps(context) {
       `${env.BASE_API_URL}/users/${round.gameMasterId}`
     );
     const gameMaster = gameMasterRes.data;
+
+    const genres = await getGenre();
+
+    const splitRoundGenres = round.genres.split(",");
+
+    const genreDisplayValues = splitRoundGenres.map((code) => {
+      const genre = genres.find((g) => g.code === code.trim());
+      return genre ? genre.value : code; // Fallback to the code if no matching genre is found
+    });
+
+    round.genre = genreDisplayValues.join(", ");
 
     return {
       props: {

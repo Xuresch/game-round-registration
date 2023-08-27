@@ -1,0 +1,73 @@
+
+/* The container for the genres and the "Edit" button */
+.generesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  /* The container for the selected genres */
+  .selectedGenresContainer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  
+  .genresLabel {
+    margin-right: 10px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  /* A single selected genre */
+  .selectedGenre {
+    color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(96, 125, 139, 0.25) ;
+    padding: 0px 0px 0px 10px;
+    border-radius: 20px;
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .selectedGenre:hover {
+    background-color: #607d8b;
+  }
+  
+  .selectedGenre:hover,
+  .selectedGenre:hover button {
+    color: white;
+  }
+  
+  /* The button to delete a selected genre */
+  .deleteGenreButton {
+    padding: 5px 10px 5px 5px;
+    margin-left: 5px;
+    background-color: transparent;
+    color: rgba(0, 0, 0, 0.6);
+    border: none;
+    border-radius: 0% 50% 50% 0%;
+    cursor: pointer;
+  }
+  
+  .deleteGenreButton:hover {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  /* The "Edit" button */
+  .addGenreButton {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #607d8b;
+    cursor: pointer;
+  }
+  
+  .addGenreButton:hover {
+    background-color: #ffc107;
+  }
+  

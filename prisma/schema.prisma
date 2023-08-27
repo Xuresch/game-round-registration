@@ -11,18 +11,18 @@ datasource db {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?
-  access_token       String?
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -38,22 +38,22 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?   
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  userName      String?   @unique
-  role        String    @default("normal") // Possible values: normal, organizer, admin
-  expiryDate  DateTime? // Optional, only for temporary users
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                  String               @id @default(cuid())
+  name                String?
+  email               String?              @unique
+  emailVerified       DateTime?
+  image               String?
+  userName            String?              @unique
+  role                String               @default("normal") // Possible values: normal, organizer, admin
+  expiryDate          DateTime? // Optional, only for temporary users
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
   // Relations
-  OrganizedEvents   Event[]
-  MasteredGameRounds GameRound[]
+  OrganizedEvents     Event[]
+  MasteredGameRounds  GameRound[]
   PlayerRegistrations PlayerRegistration[]
-  accounts      Account[]
-  sessions      Session[]
+  accounts            Account[]
+  sessions            Session[]
 }
 
 model VerificationToken {
@@ -66,46 +66,47 @@ model VerificationToken {
 
 model TempUserData {
   email     String   @id @unique
-  userName      String
+  userName  String
   createdAt DateTime @default(now())
 }
 
 model Event {
-  id          String    @id @default(uuid())
+  id          String      @id @default(uuid())
   organizerId String
-  Organizer   User      @relation(fields: [organizerId], references: [id])
+  Organizer   User        @relation(fields: [organizerId], references: [id])
   name        String
   description String?
   startDate   DateTime
   endDate     DateTime
-  timeSlots   String?   // Optional field to store timeslots as JSON string
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  timeSlots   String? // Optional field to store timeslots as JSON string
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   // Relations
-  GameRounds   GameRound[]
+  GameRounds  GameRound[]
 }
 
 model GameRound {
-  id              String       @id @default(uuid())
-  eventId         String?
-  Event           Event?    @relation(fields: [eventId], references: [id])
-  gameMasterId    String
-  GameMaster      User      @relation(fields: [gameMasterId], references: [id])
-  name            String
-  description     String?
-  gameType        String    // Roleplay, tabletop, boardgame
-  gameSystem      String?   // Only if gameType is 'roleplay'
-  genre           String?
-  recommendedAge  Int?
-  startTime       DateTime
-  endTime         DateTime
-  playerLimit     Int
-  waitingList     Boolean   @default(false)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  extraDetails    String?   // A JSON field for additional info
+  id                  String               @id @default(uuid())
+  eventId             String?
+  Event               Event?               @relation(fields: [eventId], references: [id])
+  gameMasterId        String
+  GameMaster          User                 @relation(fields: [gameMasterId], references: [id])
+  name                String
+  description         String?
+  gameType            String // Roleplay, tabletop, boardgame
+  gameSystem          String? // Only if gameType is 'roleplay'
+  genres              String?
+  recommendedAge      Int?
+  startTime           DateTime
+  endTime             DateTime
+  playerLimit         Int
+  waitingList         Boolean              @default(false)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  extraDetails        String? // A JSON field for additional info
   // Relations
   PlayerRegistrations PlayerRegistration[]
+  GameRoundGenre      GameRoundGenre[]
 }
 
 model PlayerRegistration {
@@ -114,6 +115,22 @@ model PlayerRegistration {
   Player      User      @relation(fields: [playerId], references: [id])
   gameRoundId String
   GameRound   GameRound @relation(fields: [gameRoundId], references: [id])
-  status      String    // Either 'registered' or 'waiting'
+  status      String // Either 'registered' or 'waiting'
   joinedAt    DateTime  @default(now())
+}
+
+model Genre {
+  id     Int              @id @default(autoincrement())
+  code   String           @unique
+  value  String
+  rounds GameRoundGenre[] // Relation to GameRoundGenre for many-to-many relationship
+}
+
+model GameRoundGenre {
+  gameRoundId String
+  genreId     Int
+  gameRound   GameRound @relation(fields: [gameRoundId], references: [id])
+  genre       Genre     @relation(fields: [genreId], references: [id])
+
+  @@id([gameRoundId, genreId])
 }

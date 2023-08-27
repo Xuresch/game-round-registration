@@ -9,7 +9,7 @@ const schema = Joi.object({
   description: Joi.string(),
   gameType: Joi.string(),
   gameSystem: Joi.string(),
-  genre: Joi.string(),
+  genres: Joi.string(),
   recommendedAge: Joi.number().integer(),
   startTime: Joi.string().isoDate(),
   endTime: Joi.string().isoDate(),
@@ -40,6 +40,17 @@ export default async function gameRoundHandler(req, res) {
       return;
     }
 
+    // Fetch associated genres for the game round
+    const associatedGenres = await prisma.gameRoundGenre.findMany({
+      where: { gameRoundId: gameRoundId },
+      include: {
+        genre: true,
+      },
+    });
+
+    // Extract genre details
+    const genres = associatedGenres.map((association) => association.genre);
+
     const registeredPlayersCount = await prisma.playerRegistration.count({
       where: { gameRoundId: gameRoundId, status: "registered" },
     });
@@ -47,7 +58,7 @@ export default async function gameRoundHandler(req, res) {
     gameRound.extraDetails = JSON.parse(gameRound.extraDetails);
     gameRound.registeredPlayersCount = registeredPlayersCount;
 
-    res.json(gameRound);
+    res.json({ ...gameRound, genres });
   } else if (req.method === "PUT") {
     try {
       validate(schema, req.body);
@@ -55,14 +66,36 @@ export default async function gameRoundHandler(req, res) {
       res.status(400).json({ message: error.message });
       return;
     }
+    const genreCodes = req.body.genres.split(",");
 
     const updatedGameRound = await prisma.gameRound.update({
       where: { id: gameRoundId },
       data: {
         ...req.body,
+        genres: undefined, // Exclude genres from update
         extraDetails: JSON.stringify(req.body.extraDetails),
       },
     });
+
+    // Delete existing genre associations for the game round
+    await prisma.gameRoundGenre.deleteMany({
+      where: { gameRoundId: gameRoundId },
+    });
+
+    // Add new genre associations for the game round
+    for (const genreCode of genreCodes) {
+      const genre = await prisma.genre.findUnique({
+        where: { code: genreCode },
+      });
+      if (genre) {
+        await prisma.gameRoundGenre.create({
+          data: {
+            gameRoundId: gameRoundId,
+            genreId: genre.id,
+          },
+        });
+      }
+    }
 
     res.json(updatedGameRound);
   } else if (req.method === "DELETE") {
