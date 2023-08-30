@@ -10,7 +10,7 @@ const schema = Joi.object({
   description: Joi.string().required(),
   gameType: Joi.string().required(),
   gameSystem: Joi.string().allow(null),
-  genre: Joi.string().required(),
+  genres: Joi.string().required().allow(null),
   recommendedAge: Joi.number().integer(),
   startTime: Joi.string().isoDate().required(),
   endTime: Joi.string().isoDate().required(),
@@ -86,9 +86,29 @@ export default async function gameRoundsHandler(req, res) {
     const newGameRound = await prisma.gameRound.create({
       data: {
         ...req.body,
+        genres: undefined, // Exclude genres from update
         extraDetails: JSON.stringify(req.body.extraDetails),
       },
     });
+
+    if (req.body.genres !== null) {
+      const genreCodes = req.body.genres.split(",");
+
+      // Add new genre associations for the game round
+      for (const genreCode of genreCodes) {
+        const genre = await prisma.genre.findUnique({
+          where: { code: genreCode },
+        });
+        if (genre) {
+          await prisma.gameRoundGenre.create({
+            data: {
+              gameRoundId: newGameRound.id,
+              genreId: genre.id,
+            },
+          });
+        }
+      }
+    }
 
     res.json(newGameRound);
   } else {
