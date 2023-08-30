@@ -134,10 +134,10 @@ function UpdateGameRoundPage({
       gameType: gameRound.gameType,
       gameSystem: gameRound.gameSystem,
       genres: selectedGenres.map((genre) => genre.code).join(","),
-      recommendedAge: gameRound.recommendedAge,
+      recommendedAge: +gameRound.recommendedAge,
       startTime: gameRound.startTime,
       endTime: gameRound.endTime,
-      playerLimit: gameRound.playerLimit,
+      playerLimit: +gameRound.playerLimit,
       waitingList: gameRound.waitingList,
       extraDetails: gameRound.extraDetails,
     };
@@ -262,7 +262,13 @@ function UpdateGameRoundPage({
               setGameRound({ ...gameRound, gameType: event.target.value })
             }
           />
-          <TextInput label="Spiel System" value={gameRound.gameSystem} />
+          <TextInput
+            label="Spiel System"
+            value={gameRound.gameSystem}
+            onChange={(event) =>
+              setGameRound({ ...gameRound, gameSystem: event.target.value })
+            }
+          />
           <GenresFormField
             selectedGenres={selectedGenres}
             handleDeleteGenre={handleDeleteGenre}
@@ -323,7 +329,9 @@ function UpdateGameRoundPage({
 export async function getServerSideProps(context) {
   const { id } = context.params; // Extract the round ID from the context
   const roundId = id;
+
   try {
+    // Get the user from the session
     const sessionGet = await getSession({ req: context.req });
     const user = sessionGet?.user || null;
 
@@ -333,16 +341,17 @@ export async function getServerSideProps(context) {
     // Fetch gameMaster details
     const gameMaster = await getUser(round.gameMasterId);
 
+    // Fetch event time slots
     let eventTimeSlots = null;
     if (round.eventId != null) {
       const event = await getEvent(round.eventId);
       eventTimeSlots = event.timeSlots;
     }
 
+    // Fetch genres
     const genres = await getGenre();
-    // console.log(genres);
-    // console.log(round);
 
+    // If the user is the game master or an admin, return the round details
     if (user?.id === round.gameMasterId || user?.role == "admin") {
       return {
         props: {
@@ -353,7 +362,18 @@ export async function getServerSideProps(context) {
           genres,
         },
       };
-    } else {
+    }
+    // If the user is a player, redirect to the player page
+    else if (user != null) {
+      return {
+        redirect: {
+          destination: "/rounds/[id]/player",
+          permanent: false,
+        },
+      };
+    }
+    // Otherwise, redirect to the login page
+    else {
       return {
         redirect: {
           destination: "/auth",
@@ -362,9 +382,10 @@ export async function getServerSideProps(context) {
       };
     }
   } catch (error) {
+    // Log any errors and return a 404 page
     console.error("Error fetching data:", error);
     return {
-      notFound: true, // This will return a 404 page
+      notFound: true,
     };
   }
 }
