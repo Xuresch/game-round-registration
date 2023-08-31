@@ -126,7 +126,10 @@ function DeteilRoundPage({ round, gameMaster, user }) {
 
   if (playerRegistration && loadedSession) {
     buttonLabel = "Abmelden";
-  } else if (round.registeredPlayersCount < round.playerLimit) {
+  } else if (
+    round.registeredPlayersCount < round.playerLimit ||
+    !round.playerLimit
+  ) {
     buttonLabel = "Registrieren";
   } else if (round.waitingList) {
     buttonLabel = "Zur Warteliste hinzufügen";
@@ -138,6 +141,27 @@ function DeteilRoundPage({ round, gameMaster, user }) {
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
+
+  const displayRegisteredPlayersCount = () => {
+    if (round.playerLimit > 0) {
+      return (
+        <InformationItem
+          label="Spieler Anzahl"
+          value={`${registeredPlayersCount} von ${round.playerLimit}`}
+        />
+      );
+    }
+    if (round.playerLimit == 0) {
+      return (
+        <InformationItem
+          label="Spieler Anzahl"
+          value={`${registeredPlayersCount} von Unbegrenzt`}
+        />
+      );
+    } else {
+      return null;
+    }
+  };
 
   return (
     <Card>
@@ -181,12 +205,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
             label="Altersempfehlung"
             value={`${round.recommendedAge} Jahre`}
           />
-          {round.playerLimit > 0 && (
-            <InformationItem
-              label="Spieler Anzahl"
-              value={`${registeredPlayersCount} von ${round.playerLimit}`}
-            />
-          )}
+          {displayRegisteredPlayersCount()}
           <InformationItem label="Beginn" value={`${displayStartDate} Uhr`} />
           <InformationItem label="Ende" value={`${displayEndDate} Uhr`} />
         </div>

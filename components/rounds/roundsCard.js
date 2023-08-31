@@ -69,6 +69,38 @@ function GameRound({ round }) {
     router.push(`${env.BASE_URL}/rounds/${round.id}/update`);
   };
 
+  const displayRegisteredPlayersCount = () => {
+    if (round.playerLimit > 0) {
+      return (
+        <ContentElement>
+          <b>Spieler Anzahl:</b> {round.registeredPlayersCount} von{" "}
+          {round.playerLimit}
+        </ContentElement>
+      );
+    }
+    if (round.playerLimit == 0) {
+      return (
+        <ContentElement>
+          <b>Spieler Anzahl:</b> {round.registeredPlayersCount}
+        </ContentElement>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const displayRecommendedAge = () => {
+    if (round.recommendedAge >= 0) {
+      return (
+        <ContentElement>
+          <b>Empfohlenes Alter:</b> {`ab ${round.recommendedAge} Jahren`}
+        </ContentElement>
+      );
+    } else {
+      return null;
+    }
+  };
+
   return (
     <SmallCard>
       <h2 className={styles.title}>{round.name}</h2>
@@ -102,17 +134,9 @@ function GameRound({ round }) {
           <b>System:</b> {round.gameSystem}
         </ContentElement>
       )}
-      {round.playerLimit > 0 && (
-        <ContentElement>
-          <b>Spieler Anzahl:</b> {round.registeredPlayersCount} von{" "}
-          {round.playerLimit}
-        </ContentElement>
-      )}
-      {round.recommendedAge && (
-        <ContentElement>
-          <b>Forgeschalgenes Alter:</b> {round.recommendedAge}
-        </ContentElement>
-      )}
+      {displayRegisteredPlayersCount()}
+      {displayRecommendedAge()}
+
       {/* {round.extraDetails && (
         <ContentElement>
           <b>Zusätzliche Deteils:</b> {round.extraDetails}
