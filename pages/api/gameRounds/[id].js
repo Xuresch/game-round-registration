@@ -4,17 +4,17 @@ import { validate } from "@/helpers/validate";
 
 const schema = Joi.object({
   eventId: Joi.string().allow(null),
-  gameMasterId: Joi.string(),
-  name: Joi.string(),
-  description: Joi.string(),
-  gameType: Joi.string(),
+  gameMasterId: Joi.string().required(),
+  name: Joi.string().required(),
+  description: Joi.string().allow(null, ""),
+  gameType: Joi.string().required(),
   gameSystem: Joi.string().allow(null),
-  genres: Joi.string(),
+  genres: Joi.string().required().allow(null),
   recommendedAge: Joi.number().integer(),
-  startTime: Joi.string().isoDate(),
-  endTime: Joi.string().isoDate(),
-  playerLimit: Joi.number().integer(),
-  waitingList: Joi.boolean(),
+  startTime: Joi.string().isoDate().required(),
+  endTime: Joi.string().isoDate().required(),
+  playerLimit: Joi.number().integer().required(),
+  waitingList: Joi.boolean().required(),
   extraDetails: Joi.string().allow(null),
   // extraDetails: Joi.object().pattern(
   //   Joi.string(),
@@ -66,7 +66,6 @@ export default async function gameRoundHandler(req, res) {
       res.status(400).json({ message: error.message });
       return;
     }
-    const genreCodes = req.body.genres.split(",");
 
     const updatedGameRound = await prisma.gameRound.update({
       where: { id: gameRoundId },
@@ -82,23 +81,37 @@ export default async function gameRoundHandler(req, res) {
       where: { gameRoundId: gameRoundId },
     });
 
-    // Add new genre associations for the game round
-    for (const genreCode of genreCodes) {
-      const genre = await prisma.genre.findUnique({
-        where: { code: genreCode },
-      });
-      if (genre) {
-        await prisma.gameRoundGenre.create({
-          data: {
-            gameRoundId: gameRoundId,
-            genreId: genre.id,
-          },
+    if (req.body.genres !== null) {
+      const genreCodes = req.body.genres.split(",");
+
+      // Add new genre associations for the game round
+      for (const genreCode of genreCodes) {
+        const genre = await prisma.genre.findUnique({
+          where: { code: genreCode },
         });
+        if (genre) {
+          await prisma.gameRoundGenre.create({
+            data: {
+              gameRoundId: gameRoundId,
+              genreId: genre.id,
+            },
+          });
+        }
       }
     }
 
     res.json(updatedGameRound);
   } else if (req.method === "DELETE") {
+    // Delete existing genre associations for the game round
+    await prisma.gameRoundGenre.deleteMany({
+      where: { gameRoundId: gameRoundId },
+    });
+
+    // Delete existing player registrations for the game round
+    await prisma.playerRegistration.deleteMany({
+      where: { gameRoundId: gameRoundId },
+    });
+
     const deletedGameRound = await prisma.gameRound.delete({
       where: { id: gameRoundId },
     });

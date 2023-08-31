@@ -49,10 +49,10 @@ const schema = Yup.object().shape({
   startTime: Yup.date().required(),
   endTime: Yup.date().required(),
   gameType: Yup.string().required(),
-  gameSystem: Yup.string(),
+  gameSystem: Yup.string().nullable(),
   genre: Yup.string(),
-  recommendedAge: Yup.number(),
-  playerLimit: Yup.number().required(),
+  recommendedAge: Yup.number().positive().min(0),
+  playerLimit: Yup.number().required().positive().min(0),
   waitingList: Yup.bool().required(),
 });
 
@@ -79,6 +79,7 @@ function UpdateGameRoundPage({
   const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [errors, setErrors] = useState([]);
 
   useEffect(() => {
     async function fetchGameRound() {
@@ -126,6 +127,30 @@ function UpdateGameRoundPage({
       gameRound.endTime = formatISO(new Date(endTime));
     }
 
+    schema
+      .validate(gameRound, {
+        abortEarly: false, // Prevent aborting validation after first error
+      })
+      .catch((err) => {
+        const errors = err.inner.reduce((acc, error) => {
+          return {
+            ...acc,
+            [error.path]: true,
+          };
+        }, {});
+        setErrors(errors);
+      });
+
+    if (!schema.isValidSync(gameRound)) {
+      return;
+    }
+
+    if (selectedGenres.length > 0) {
+      gameRound.genres = selectedGenres.map((genre) => genre.code).join(",");
+    } else {
+      gameRound.genres = null;
+    }
+
     const payload = {
       eventId: gameRound.eventId,
       gameMasterId: gameRound.gameMasterId,
@@ -133,7 +158,7 @@ function UpdateGameRoundPage({
       description: gameRound.description,
       gameType: gameRound.gameType,
       gameSystem: gameRound.gameSystem,
-      genres: selectedGenres.map((genre) => genre.code).join(","),
+      genres: gameRound.genres,
       recommendedAge: +gameRound.recommendedAge,
       startTime: gameRound.startTime,
       endTime: gameRound.endTime,
@@ -241,6 +266,7 @@ function UpdateGameRoundPage({
             onChange={(event) =>
               setGameRound({ ...gameRound, name: event.target.value })
             }
+            error={errors.name ? "Runden Title wird benötigt!" : null}
           />
           <TextArea
             label="Beschreibung"
@@ -283,12 +309,22 @@ function UpdateGameRoundPage({
                 recommendedAge: event.target.value,
               })
             }
+            error={
+              errors.recommendedAge
+                ? "Empfolenes Alter darf nicht negativ sein!"
+                : null
+            }
           />
           <NumberInput
             label="Spieler Limit"
             value={gameRound.playerLimit}
             onChange={(event) =>
               setGameRound({ ...gameRound, playerLimit: event.target.value })
+            }
+            error={
+              errors.playerLimit
+                ? "Spieler limit darf nicht negativ sein!"
+                : null
             }
           />
           {timeSlots?.length > 0 ? (

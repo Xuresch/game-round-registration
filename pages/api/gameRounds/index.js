@@ -7,7 +7,7 @@ const schema = Joi.object({
   eventId: Joi.string().allow(null),
   gameMasterId: Joi.string().required(),
   name: Joi.string().required(),
-  description: Joi.string().required(),
+  description: Joi.string().allow(null, ""),
   gameType: Joi.string().required(),
   gameSystem: Joi.string().allow(null),
   genres: Joi.string().required().allow(null),

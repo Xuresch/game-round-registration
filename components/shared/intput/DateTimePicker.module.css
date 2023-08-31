@@ -13,7 +13,7 @@
 
 .datetimePicker input {
   padding: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.23);
+  border: 1px solid rgba(0, 0, 0, 0.42);
   border-radius: 4px;
   font-size: 16px;
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
@@ -21,6 +21,6 @@
 }
 
 .datetimePicker input:focus {
-  border-color: #6200ea;
   outline: none;
+  border: 1px solid #ffc107;
 }
