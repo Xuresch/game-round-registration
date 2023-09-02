@@ -3,11 +3,13 @@
 
 generator client {
   provider = "prisma-client-js"
+  shadowDatabase  = false
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model Account {
