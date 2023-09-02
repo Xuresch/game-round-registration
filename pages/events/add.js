@@ -84,6 +84,7 @@ function CreateEventPage({ session }) {
       organizerId: user.id,
       timeSlots: arrayToJson(data.timeSlots),
     };
+    // console.log(data);
 
     try {
       await createEvent(data);

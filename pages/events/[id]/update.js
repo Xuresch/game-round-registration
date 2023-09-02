@@ -180,7 +180,7 @@ function UpdateEventPage({ eventId }) {
       organizerId: data.organizerId,
       timeSlots: arrayToJson(data.timeSlots),
     };
-
+    // console.log(data);
     try {
       await updateEvent(data);
     } catch (err) {
