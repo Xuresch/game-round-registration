@@ -34,7 +34,7 @@ const Menu = () => {
         )}
         {loadedSession && (
           <li className={`${styles.menu_list_element} ${styles.log_in}`}>
-            <Link href={`/profile/${"Test"}`}>Profile</Link>
+            <Link href={`/users/${user.id}/update`}>Profil</Link>
           </li>
         )}
         {!loadedSession && (

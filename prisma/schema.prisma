@@ -4,6 +4,7 @@
 generator client {
   provider = "prisma-client-js"
   shadowDatabase  = false
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -114,7 +115,7 @@ model GameRound {
 model PlayerRegistration {
   id          Int       @id @default(autoincrement())
   playerId    String
-  Player      User      @relation(fields: [playerId], references: [id])
+  Player      User      @relation(fields: [playerId], references: [id], onDelete: Cascade)
   gameRoundId String
   GameRound   GameRound @relation(fields: [gameRoundId], references: [id])
   status      String // Either 'registered' or 'waiting'

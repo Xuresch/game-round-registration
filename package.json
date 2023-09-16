@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:test": "dotenv -e .env.test -- npx prisma migrate deploy",
     "prisma:purge": "prisma db push --force-reset",
     "prisma:seed": "node prisma/seed.js"
   },
