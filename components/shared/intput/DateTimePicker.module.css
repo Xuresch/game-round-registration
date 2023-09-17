@@ -24,3 +24,10 @@
   outline: none;
   border: 1px solid #ffc107;
 }
+
+/* create a section for mobile view */
+@media only screen and (max-width: 768px) {
+  .datetimePicker {
+    width: 100%;
+  }
+}

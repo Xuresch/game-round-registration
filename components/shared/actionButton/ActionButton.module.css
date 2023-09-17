@@ -26,3 +26,12 @@
 .edit:hover {
   background-color: #8bc34a;
 }
+
+@media only screen and (max-width: 768px) {
+  .links {
+    position: relative;
+    top: 0em; /* positioning links */
+    right: 0em; /* positioning links */
+    margin: auto;
+  }
+}

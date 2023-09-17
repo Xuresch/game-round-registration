@@ -86,14 +86,6 @@
   justify-content: center;
 }
 
-/* Style for the event title */
-.title {
-  font-size: 1.5em;
-  color: rgba(0, 0, 0, 0.87);
-  text-align: center;
-  margin-bottom: 2em;
-}
-
 .roundAddContainer {
   display: flex;
   align-items: center;
@@ -101,4 +93,25 @@
   flex-direction: column;
   height: 100%;
   cursor: pointer;
+}
+
+/* create a section for mobile view */
+@media only screen and (max-width: 768px) {
+  .title {
+    font-size: 2em;
+    color: rgba(0, 0, 0, 0.87);
+    text-align: center; /* center the title */
+    margin-bottom: 1em;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: 0;
+    gap: 0;
+  }
 }

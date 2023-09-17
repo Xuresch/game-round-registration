@@ -335,7 +335,7 @@ export async function getServerSideProps(context) {
     const user = sessionGet?.user || null;
 
     // Fetch event time slots
-    let eventTimeSlots = null;
+    let eventTimeSlots = {"slot_1":{"start":"","end":""}};
     if (eventId) {
       const event = await getEvent(eventId);
       eventTimeSlots = event.timeSlots;

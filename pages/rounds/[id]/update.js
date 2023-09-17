@@ -95,17 +95,18 @@ function UpdateGameRoundPage({
 
       setStartTime(startTime);
       setEndTime(endTime);
+      if (eventTimeSlots != null) {
+        if (eventTimeSlots.slot_1.start != "") {
+          const timeSlotsArray = Object.keys(eventTimeSlots).map((key) => {
+            const { start, end } = eventTimeSlots[key];
+            return {
+              value: `${start}-${end}`,
+              label: `Von ${formatDateTime(start)} bis ${formatDateTime(end)}`,
+            };
+            setTimeSlots(timeSlotsArray);
+          });
+        }
 
-      if (eventTimeSlots) {
-        const timeSlotsArray = Object.keys(eventTimeSlots).map((key) => {
-          const { start, end } = eventTimeSlots[key];
-          return {
-            value: `${start}-${end}`,
-            label: `Von ${formatDateTime(start)} bis ${formatDateTime(end)}`,
-          };
-        });
-
-        setTimeSlots(timeSlotsArray);
         setSelectedTimeSlot(`${startTime}-${endTime}`);
       }
     }
