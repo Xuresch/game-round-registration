@@ -2,9 +2,13 @@ import Link from "next/link";
 import styles from "./Menu.module.css";
 import { signOut } from "next-auth/react";
 import useSessionApp from "@/hooks/useSessionApp";
+import { useRouter } from "next/router";
 
 const Menu = () => {
-  const {isLoading, loadedSession, user} = useSessionApp();
+  const { isLoading, loadedSession, user } = useSessionApp();
+  const router = useRouter();
+
+  console.log(router.asPath)
 
   function logoutHandler() {
     signOut();
@@ -20,20 +24,28 @@ const Menu = () => {
     <nav className={styles.menu}>
       <ul className={styles.menu_unorderd_list}>
         {sites.map((site) => (
-          <li className={styles.menu_list_element} key={site.id}>
+          <li
+            className={`${styles.menu_list_element} ${
+              router.pathname === site.path ? styles.activeLink : ""
+            }`}
+            key={site.id}
+          >
             <Link href={site.path}>{site.lable}</Link>
           </li>
         ))}
         {loadedSession && (
-          <button
-            className={`${styles.button} ${styles.log_in}`}
-            onClick={logoutHandler}
-          >
-            Logout
-          </button>
+          <li className={`${styles.menu_list_element} ${styles.log_in}`}>
+            <Link href={`#`} onClick={logoutHandler}>
+              Logout{" "}
+            </Link>
+          </li>
         )}
         {loadedSession && (
-          <li className={`${styles.menu_list_element} ${styles.log_in}`}>
+          <li
+            className={`${styles.menu_list_element} ${styles.log_in} ${
+              router.asPath === `/users/${user.id}/update` ? styles.activeLink : ""
+            }`}
+          >
             <Link href={`/users/${user.id}/update`}>Profil</Link>
           </li>
         )}

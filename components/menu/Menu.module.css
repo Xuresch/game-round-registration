@@ -14,7 +14,8 @@
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
 }
 
-.menu_list_element > a, .menu_list_element > button {
+.menu_list_element > a,
+.menu_list_element > button {
   float: left;
 }
 
@@ -23,6 +24,10 @@
   text-align: center;
   padding: 1.5em 1.5em;
   text-decoration: none;
+  color: #fff;
+}
+
+.activeLink > a {
   color: #ffc107;
 }
 
@@ -33,23 +38,6 @@
 
 .log_in {
   float: right;
-}
-
-.button {
-  display: block;
-  color: #ffc107;
-  text-align: center;
-  padding: 1.5em 1.5em;
-  text-decoration: none;
-  font-size: 1em;
-  cursor: pointer;
-  background: none; /* Ensuring the button has no default background */
-  border: none; /* Removing the default button border */
-}
-
-.button:hover {
-  background-color: #ffc107;
-  color: #607d8b;
 }
 
 .user_name {
