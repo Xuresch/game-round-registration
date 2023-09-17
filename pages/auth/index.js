@@ -12,7 +12,7 @@ import { env } from "@/helpers/env";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
-  email: Yup.string().required(),
+  email: Yup.string().email().required(),
 });
 
 function AuthPage() {

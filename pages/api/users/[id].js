@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { validate } from "@/helpers/validate";
 
 const schema = Joi.object({
-  username: Joi.string(),
+  userName: Joi.string(),
   email: Joi.string().email(),
   password: Joi.string().min(8),
   role: Joi.string().valid("temporary", "normal", "organizer", "admin"),

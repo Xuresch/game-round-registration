@@ -16,3 +16,14 @@
   margin: 0 auto;
   padding: 1em;
 }
+
+/* create a section for mobile view */
+@media only screen and (max-width: 768px) {
+  .form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1em 0em;
+  }
+}

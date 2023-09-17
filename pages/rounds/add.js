@@ -67,7 +67,7 @@ function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
 
   useEffect(() => {
     async function fetchData() {
-      if (eventTimeSlots) {
+      if (eventTimeSlots.slot_1.start != "") {
         const timeSlotsArray = Object.keys(eventTimeSlots).map((key) => {
           const { start, end } = eventTimeSlots[key];
           return {
@@ -335,7 +335,7 @@ export async function getServerSideProps(context) {
     const user = sessionGet?.user || null;
 
     // Fetch event time slots
-    let eventTimeSlots = null;
+    let eventTimeSlots = {"slot_1":{"start":"","end":""}};
     if (eventId) {
       const event = await getEvent(eventId);
       eventTimeSlots = event.timeSlots;

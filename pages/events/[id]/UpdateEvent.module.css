@@ -103,3 +103,30 @@
 .textarea {
   height: 7em;
 }
+
+/* create a section for mobile view */
+@media only screen and (max-width: 768px) {
+  .links {
+    position: relative;
+    top: 0em; /* positioning links */
+    right: 0em; /* positioning links */
+    margin: auto;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1em 0em;
+  }
+
+  .timeSlotCard {
+    margin: 1em 0em;
+  }
+
+  .timeSlot {
+    flex-direction: column;
+  }
+
+}
