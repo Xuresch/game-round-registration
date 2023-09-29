@@ -13,6 +13,8 @@ import RegisteredPlayers from "@/components/registeredPlayers/registeredPlayers"
 import {
   deletePlayerRegistration,
   getPlayerRegistration,
+  getRegisteredPlayers,
+  getWaitingPlayers,
   promoteOldestWaitingPlayer,
   registerPlayer,
 } from "@/lib/rounds/playerRegistrationService";
@@ -37,12 +39,19 @@ function DeteilRoundPage({ round, gameMaster, user }) {
     round.registeredPlayersCount
   );
 
+  const [players, setPlayers] = useState([]);
+  const [waitingList, setWaitingList] = useState([]);
+
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     async function fetchPlayerRegistration() {
       const registration = await getPlayerRegistration(user?.id, round.id);
       setPlayerRegistration(registration);
+      const players = await getRegisteredPlayers(round.id);
+      setPlayers(players);
+      const waitingList = await getWaitingPlayers(round.id);
+      setWaitingList(waitingList);
     }
 
     fetchPlayerRegistration();
@@ -52,7 +61,13 @@ function DeteilRoundPage({ round, gameMaster, user }) {
     await deletePlayerRegistration(playerRegistration.id);
     setPlayerRegistration(null);
     promoteOldestWaitingPlayer(round);
-    setRegisteredPlayersCount((prevCount) => prevCount - 1);
+    const players = await getRegisteredPlayers(round.id);
+    setPlayers(players);
+    const waitingList = await getWaitingPlayers(round.id);
+    setWaitingList(waitingList);
+    if (waitingList.length === 0) {
+      setRegisteredPlayersCount((prevCount) => prevCount - 1);
+    }
   };
 
   const handleRegister = async () => {
@@ -226,7 +241,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
           {isLoading ? "Laden..." : buttonLabel}
         </button>
       </div>
-      <RegisteredPlayers gameRoundId={round.id} isLoading={isLoading} />
+      <RegisteredPlayers players={players} waitingList={waitingList} />
     </Card>
   );
 }
