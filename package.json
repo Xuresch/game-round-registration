@@ -10,6 +10,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:test": "dotenv -e .env.test -- npx prisma migrate deploy",
+    "prisma:migrate:prod": "dotenv -e .env.production -- npx prisma migrate deploy",
     "prisma:purge": "prisma db push --force-reset",
     "prisma:seed": "node prisma/seed.js"
   },
@@ -28,6 +29,8 @@
     "dotenv": "^16.3.1",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.1",
+    "mjml": "^4.14.1",
+    "mjml-browser": "^4.14.1",
     "next": "13.4.10",
     "next-auth": "^4.22.3",
     "nodemailer": "^6.9.4",

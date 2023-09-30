@@ -26,6 +26,7 @@ import { formatRoundDates } from "@/helpers/dateFormatter";
 import ActionButtons from "@/components/shared/actionButton/actionButton";
 import InformationItem from "@/components/shared/informationItem/informationItem";
 import { getUser } from "@/lib/user/userService";
+import apiService from "@/lib/shared/apiService";
 
 function DeteilRoundPage({ round, gameMaster, user }) {
   const router = useRouter();
@@ -60,7 +61,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
   const handleUnregister = async () => {
     await deletePlayerRegistration(playerRegistration.id);
     setPlayerRegistration(null);
-    promoteOldestWaitingPlayer(round);
+    const oldestWaitingPlayer = await promoteOldestWaitingPlayer(round);
     const players = await getRegisteredPlayers(round.id);
     setPlayers(players);
     const waitingList = await getWaitingPlayers(round.id);
@@ -68,7 +69,166 @@ function DeteilRoundPage({ round, gameMaster, user }) {
     if (waitingList.length === 0) {
       setRegisteredPlayersCount((prevCount) => prevCount - 1);
     }
+    if (oldestWaitingPlayer) {
+      sendEmailDataPlayer(round, oldestWaitingPlayer.Player);
+      sendWaitinglistUpdateEmailDataGm(round, user, oldestWaitingPlayer.Player);
+      sendUnregistEmailDataPlayer(round);
+    } else {
+      sendUnregistEmailDataPlayer(round);
+      sendUnregistEmailDataGm(round);
+    }
   };
+
+  async function sendEmailDataPlayer(roundData, userData=user) {
+    try {
+      const emailData = {
+        templateName: "registNewPlayer",
+        templateData: {
+          name: userData.userName,
+          roundName: roundData.name,
+          roundUrl: `${env.BASE_URL}/rounds/${roundData.id}`,
+        },
+        emailDetails: {
+          to: userData.email,
+          subject: `Registrierung für Spielrunde ${roundData.name}!`,
+        },
+      };
+      const response = await apiService.sendEmail(emailData);
+      console.log("Email sent successfully:", response);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+    }
+  }
+
+  async function sendUnregistEmailDataPlayer(roundData) {
+    try {
+      const emailData = {
+        templateName: "unregistPlayer",
+        templateData: {
+          name: user.userName,
+          roundName: roundData.name,
+        },
+        emailDetails: {
+          to: user.email,
+          subject: `Abmeldung von Spielrunde ${roundData.name}!`,
+        },
+      };
+      const response = await apiService.sendEmail(emailData);
+      console.log("Email sent successfully:", response);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+    }
+  }
+
+  async function sendWaitinglistEmailDataPlayer(roundData) {
+    try {
+      const emailData = {
+        templateName: "waitinglistPlayer",
+        templateData: {
+          name: user.userName,
+          roundName: roundData.name,
+          roundUrl: `${env.BASE_URL}/rounds/${roundData.id}`,
+        },
+        emailDetails: {
+          to: user.email,
+          subject: `Registrierung in Warteliste ${roundData.name}!`,
+        },
+      };
+      const response = await apiService.sendEmail(emailData);
+      console.log("Email sent successfully:", response);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+    }
+  }
+
+  async function sendEmailDataGm(roundData) {
+    try {
+      const emailData = {
+        templateName: "registNewPlayerGm",
+        templateData: {
+          name: gameMaster.data.userName,
+          playerName: user.userName,
+          roundName: roundData.name,
+          roundUrl: `${env.BASE_URL}/rounds/${roundData.id}`,
+        },
+        emailDetails: {
+          to: gameMaster.data.email,
+          subject: `Registrierung für Spielrunde ${roundData.name}!`,
+        },
+      };
+      const response = await apiService.sendEmail(emailData);
+      console.log("Email sent successfully:", response);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+    }
+  }
+
+  async function sendUnregistEmailDataGm(roundData) {
+    try {
+      const emailData = {
+        templateName: "unregistPlayerGm",
+        templateData: {
+          name: gameMaster.data.userName,
+          playerName: user.userName,
+          roundName: roundData.name,
+          roundUrl: `${env.BASE_URL}/rounds/${roundData.id}`,
+        },
+        emailDetails: {
+          to: gameMaster.data.email,
+          subject: `Abmeldung von Spielrunde ${roundData.name}!`,
+        },
+      };
+      const response = await apiService.sendEmail(emailData);
+      console.log("Email sent successfully:", response);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+    }
+  }
+
+  async function sendWaitinglistEmailDataGm(roundData) {
+    try {
+      const emailData = {
+        templateName: "waitinglistPlayerGm",
+        templateData: {
+          name: gameMaster.data.userName,
+          playerName: user.userName,
+          roundName: roundData.name,
+          roundUrl: `${env.BASE_URL}/rounds/${roundData.id}`,
+        },
+        emailDetails: {
+          to: gameMaster.data.email,
+          subject: `Registrierung in Warteliste ${roundData.name}!`,
+        },
+      };
+      const response = await apiService.sendEmail(emailData);
+      console.log("Email sent successfully:", response);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+    }
+  }
+
+  async function sendWaitinglistUpdateEmailDataGm(roundData, oldPlayerName, newPlayerName) {
+    try {
+      const emailData = {
+        templateName: "waitinglistUpdateGm",
+        templateData: {
+          name: gameMaster.data.userName,
+          oldPlayerName: oldPlayerName.userName,
+          newPlayerName: newPlayerName.userName,
+          roundName: roundData.name,
+          roundUrl: `${env.BASE_URL}/rounds/${roundData.id}`,
+        },
+        emailDetails: {
+          to: gameMaster.data.email,
+          subject: `Update Registrierung für Spielrunde ${roundData.name}!`,
+        },
+      };
+      const response = await apiService.sendEmail(emailData);
+      console.log("Email sent successfully:", response);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+    }
+  }
 
   const handleRegister = async () => {
     if (loadedSession === null) {
@@ -76,6 +236,8 @@ function DeteilRoundPage({ round, gameMaster, user }) {
       return;
     }
     await registerPlayer(user.id, round.id, "registered");
+    sendEmailDataPlayer(round);
+    sendEmailDataGm(round);
     setRegisteredPlayersCount((prevCount) => prevCount + 1);
   };
 
@@ -85,6 +247,8 @@ function DeteilRoundPage({ round, gameMaster, user }) {
       return;
     }
     await registerPlayer(user.id, round.id, "waiting");
+    sendWaitinglistEmailDataPlayer(round);
+    sendWaitinglistEmailDataGm(round);
   };
 
   const handleButtonClick = async () => {
