@@ -35,6 +35,7 @@ export default async function playerRegistrationsHandler(req, res) {
           Player: {
             select: {
               userName: true,
+              email: true,
             },
           },
         },

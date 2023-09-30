@@ -10,6 +10,8 @@ import styles from "./EventAdd.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { getSession } from "next-auth/react";
+import apiService from "@/lib/shared/apiService";
+import { format } from "date-fns";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -21,6 +23,7 @@ const schema = Yup.object().shape({
 });
 
 function CreateEventPage({ session }) {
+  const isClient = typeof window !== "undefined";
   const router = useRouter();
 
   const {
@@ -75,6 +78,28 @@ function CreateEventPage({ session }) {
     }, {});
   }
 
+  async function sendRegistrationEmail(eventData) {
+    try {
+      const emailData = {
+        templateName: "eventCreation",
+        templateData: {
+          name: user.userName,
+          // date: eventData.startDate,
+          eventName: eventData.name,
+          eventUrl: `${env.BASE_URL}/events/${eventData.id}`,
+        },
+        emailDetails: {
+          to: user.email,
+          subject: `Neu erstelltes Event ${eventData.name}!`,
+        },
+      };
+      const response = await apiService.sendEmail(emailData);
+      console.log("Email sent successfully:", response);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+    }
+  }
+
   const onSubmit = async (data) => {
     data = {
       name: data.name,
@@ -101,7 +126,7 @@ function CreateEventPage({ session }) {
   // handle response from the PUT request
   useEffect(() => {
     if (!createEventError && !createEventLoading && createdEventData) {
-      console.log(createdEventData);
+      sendRegistrationEmail(createdEventData);
       router.push(`${env.BASE_URL}/events/${createdEventData.id}`);
     }
   }, [createEventError, createEventLoading, createdEventData]);

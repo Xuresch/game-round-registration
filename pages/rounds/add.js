@@ -35,6 +35,7 @@ import Togglebox from "@/components/shared/intput/togglebox";
 import GenresFormField from "@/components/rounds/genresFormField";
 import TimeSlotSelector from "@/components/rounds/timeSlotSelector";
 import StartTimeEndTimePicker from "@/components/rounds/startTimeEndTimePicker";
+import apiService from "@/lib/shared/apiService";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -105,6 +106,27 @@ function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
     fetchData();
   }, []);
 
+  async function sendRegistrationEmail(roundData) {
+    try {
+      const emailData = {
+        templateName: "roundCreation",
+        templateData: {
+          name: user.userName,
+          roundName: roundData.name,
+          roundUrl: `${env.BASE_URL}/rounds/${roundData.id}`,
+        },
+        emailDetails: {
+          to: user.email,
+          subject: `Neu erstellte Spielrunde ${roundData.name}!`,
+        },
+      };
+      const response = await apiService.sendEmail(emailData);
+      console.log("Email sent successfully:", response);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+    }
+  }
+
   const onSubmit = async (data) => {
     data.preventDefault();
 
@@ -159,6 +181,7 @@ function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
 
     console.log(payload);
     const newGameRound = await createGameRound(payload);
+    sendRegistrationEmail(newGameRound);
     router.push(`${env.BASE_URL}/rounds/${newGameRound.id}`);
   };
 
@@ -335,7 +358,7 @@ export async function getServerSideProps(context) {
     const user = sessionGet?.user || null;
 
     // Fetch event time slots
-    let eventTimeSlots = {"slot_1":{"start":"","end":""}};
+    let eventTimeSlots = { slot_1: { start: "", end: "" } };
     if (eventId) {
       const event = await getEvent(eventId);
       eventTimeSlots = event.timeSlots;
