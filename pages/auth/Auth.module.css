@@ -1,0 +1,100 @@
+.header {
+  text-align: center;
+  margin-bottom: 4em;
+}
+
+.title {
+  font-size: 2em;
+  color: rgba(0, 0, 0, 0.87);
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+.subtitle {
+  font-size: 0.9em;
+  color: rgba(0, 0, 0, 0.6);
+  line-height: 20px;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1em;
+}
+
+.label {
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  margin-bottom: 0.5em;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.42);
+  border-radius: 4px;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 0.5em;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border: 1px solid #ffc107;
+}
+
+.buttonWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.button {
+  background-color: #fff;
+  color: #607d8b;
+  text-decoration: none;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+  padding: 10px 16px;
+  border: 0px solid #607d8b;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  height: 42px;
+}
+
+.button:hover {
+  background-color: #ffc107;
+}
+
+.error {
+  color: #f44336;
+  margin-bottom: 1em;
+}
+
+.registrationLink {
+  display: inline-block;
+  text-decoration: none;
+  text-transform: uppercase;
+  color: #ffc107;
+  border: none;
+  font-size: 0.9em;
+  line-height: 20px;
+  cursor: pointer;
+  background: none;
+}
+
+.form {
+  width: 50%;
+}

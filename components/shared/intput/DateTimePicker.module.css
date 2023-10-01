@@ -1,0 +1,33 @@
+.datetimePicker {
+  width: 45%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.datetimePicker label {
+  margin-bottom: 8px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 16px;
+}
+
+.datetimePicker input {
+  padding: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.42);
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.datetimePicker input:focus {
+  outline: none;
+  border: 1px solid #ffc107;
+}
+
+/* create a section for mobile view */
+@media only screen and (max-width: 768px) {
+  .datetimePicker {
+    width: 100%;
+  }
+}
