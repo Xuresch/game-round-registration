@@ -25,9 +25,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
-.env*.test
-.env*.production
+.env*
 
 # vercel
 .vercel
@@ -39,3 +37,4 @@ next-env.d.ts
 prisma/dev.db-journal
 prisma/dev.db
 prisma/migrations
+.env.test.s
