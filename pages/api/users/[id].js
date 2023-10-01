@@ -2,8 +2,10 @@ import prisma from "@/lib/prisma";
 import Joi from "joi";
 import bcrypt from "bcryptjs";
 
+import { validate } from "@/helpers/validate";
+
 const schema = Joi.object({
-  username: Joi.string(),
+  userName: Joi.string(),
   email: Joi.string().email(),
   password: Joi.string().min(8),
   role: Joi.string().valid("temporary", "normal", "organizer", "admin"),
@@ -14,10 +16,17 @@ export default async function userHandler(req, res) {
 
   if (req.method === "GET") {
     const user = await prisma.user.findUnique({
-      where: { id: Number(userId) },
+      where: { id: userId },
     });
-    if (!user) res.status(404).json({ message: "User not found" });
-    else res.json(user);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+    } else {
+      res.json({
+        code: "GetUser",
+        message: "Get user successfully!",
+        data: user,
+      });
+    }
   } else if (req.method === "PUT") {
     try {
       validate(schema, req.body);
@@ -34,16 +43,23 @@ export default async function userHandler(req, res) {
     }
 
     const updatedUser = await prisma.user.update({
-      where: { id: Number(userId) },
+      where: { id: userId },
       data,
     });
 
     res.json(updatedUser);
   } else if (req.method === "DELETE") {
     const deletedUser = await prisma.user.delete({
-      where: { id: Number(userId) },
+      where: { id: userId },
     });
-    res.json(deletedUser);
+
+    delete deletedUser.password;
+
+    res.json({
+      code: "UserDeleted",
+      message: "User has been deleted!",
+      data: deletedUser,
+    });
   } else {
     res.status(405).json({ message: "Method Not Allowed" });
   }

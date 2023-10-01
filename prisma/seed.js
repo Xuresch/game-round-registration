@@ -1,4 +1,6 @@
 // prisma/seed.js
+const bcrypt = require("bcryptjs");
+
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
@@ -19,7 +21,7 @@ async function main() {
       data: {
         username: `adminUser${i}`,
         email: `adminUser${i}@example.com`,
-        password: `password${i}`,
+        password: await bcrypt.hash(`password${i}`, 10),
         role: "admin",
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -33,7 +35,7 @@ async function main() {
       data: {
         username: `organisatorUser${i}`,
         email: `organisatorUser${i}@example.com`,
-        password: `password${i}`,
+        password: await bcrypt.hash(`password${i}`, 10),
         role: "organisator",
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -47,7 +49,7 @@ async function main() {
       data: {
         username: `normalUser${i}`,
         email: `normalUser${i}@example.com`,
-        password: `password${i}`,
+        password: await bcrypt.hash(`password${i}`, 10),
         role: "normal",
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -61,7 +63,7 @@ async function main() {
       data: {
         username: `tempUser${i}`,
         email: `tempUser${i}@example.com`,
-        password: `password${i}`,
+        password: await bcrypt.hash(`password${i}`, 10),
         role: "temporary",
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -91,6 +93,7 @@ async function main() {
         endDate: endDate,
         createdAt: new Date(),
         updatedAt: new Date(),
+        timeSlots: '{"slot_1":{"start":"","end":""}}',
       },
     });
     events.push(event);

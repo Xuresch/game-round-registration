@@ -1,0 +1,117 @@
+.title {
+  font-size: 2em;
+  color: rgba(0, 0, 0, 0.87);
+  text-align: center; /* center the title */
+  margin-bottom: 1em;
+}
+
+.text {
+  font-size: 0.9em;
+  color: rgba(0, 0, 0, 0.6);
+  line-height: 20px;
+  text-overflow: hidden;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 30% auto;
+  gap: 1em 1em;
+}
+
+.informations {
+  grid-column: 1;
+}
+
+.description {
+  grid-column: 2;
+}
+
+.roundsTitle {
+  font-size: 1.5em;
+  color: rgba(0, 0, 0, 0.87);
+  text-align: center; /* center the title */
+  margin-bottom: 1em;
+}
+
+.roundsContaioner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.button {
+  background-color: #fff;
+  color: #607d8b;
+  text-decoration: none;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+  padding: 10px 16px;
+  border: 0px solid #607d8b;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  height: 42px;
+}
+
+.button:hover {
+  background-color: #ffc107;
+  color: #607d8b;
+}
+
+.links {
+  position: absolute; /* positioning links */
+  top: 1em; /* positioning links */
+  right: 1em; /* positioning links */
+  text-align: center; /* centering links */
+}
+
+.delete:hover {
+  background-color: #f44336;
+}
+
+.edit:hover {
+  background-color: #8bc34a;
+}
+
+/* Container for holding multiple event cards */
+.gameRoundsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.roundAddContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* create a section for mobile view */
+@media only screen and (max-width: 768px) {
+  .title {
+    font-size: 2em;
+    color: rgba(0, 0, 0, 0.87);
+    text-align: center; /* center the title */
+    margin-bottom: 1em;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: 0;
+    gap: 0;
+  }
+}

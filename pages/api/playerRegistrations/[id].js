@@ -1,8 +1,10 @@
 import prisma from "@/lib/prisma";
 import Joi from "joi";
 
+import { validate } from "@/helpers/validate";
+
 const schema = Joi.object({
-  playerId: Joi.number(),
+  playerId: Joi.string(),
   gameRoundId: Joi.string(),
   status: Joi.string().valid("registered", "waiting"),
   joinedAt: Joi.date().iso(),

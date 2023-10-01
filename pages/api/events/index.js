@@ -1,26 +1,34 @@
 import prisma from "@/lib/prisma";
 import Joi from "joi";
 
+import { validate } from "@/helpers/validate";
+
 const schema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().required(),
   startDate: Joi.string().isoDate().required(),
   endDate: Joi.string().isoDate().required(),
-  organizerId: Joi.number().required(),
-  timeSlots: Joi.object().pattern(
-    Joi.string(),
-    Joi.alternatives().try(
+  organizerId: Joi.string().required(),
+  timeSlots: Joi.object()
+    .pattern(
       Joi.string(),
-      Joi.number(),
-      Joi.boolean(),
-      Joi.object()
+      Joi.alternatives().try(
+        Joi.string(),
+        Joi.number(),
+        Joi.boolean(),
+        Joi.object()
+      )
     )
-  ),
+    .allow(null),
 });
 
 export default async function eventsHandler(req, res) {
   if (req.method === "GET") {
-    const events = await prisma.event.findMany();
+    const events = await prisma.event.findMany({
+      orderBy: {
+        startDate: "asc", // Sort events by startDate
+      },
+    });
 
     // Parse the timeSlots for each event
     const parsedEvents = events.map((event) => ({
@@ -40,7 +48,9 @@ export default async function eventsHandler(req, res) {
     const newEvent = await prisma.event.create({
       data: {
         ...req.body,
-        timeSlots: JSON.stringify(req.body.timeSlots),
+        timeSlots: req.body.timeSlots
+          ? JSON.stringify(req.body.timeSlots)
+          : null,
       },
     });
 
