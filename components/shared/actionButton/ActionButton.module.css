@@ -1,0 +1,37 @@
+.links {
+  position: absolute; /* positioning links */
+  top: 1em; /* positioning links */
+  right: 1em; /* positioning links */
+  text-align: center; /* centering links */
+}
+
+.button {
+  background-color: #fff;
+  color: #607d8b;
+  text-decoration: none;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+  padding: 10px 16px;
+  border: 0px solid #607d8b;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  height: 42px;
+}
+
+.delete:hover {
+  background-color: #f44336;
+}
+
+.edit:hover {
+  background-color: #8bc34a;
+}
+
+@media only screen and (max-width: 768px) {
+  .links {
+    position: relative;
+    top: 0em; /* positioning links */
+    right: 0em; /* positioning links */
+    margin: auto;
+  }
+}

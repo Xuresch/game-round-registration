@@ -1,0 +1,27 @@
+.buttonWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.button {
+  background-color: #fff;
+  color: #607d8b;
+  text-decoration: none;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+  padding: 10px 16px;
+  border: 0px solid #607d8b;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  height: 42px;
+}
+
+.save:hover {
+  background-color: #8bc34a;
+}
+
+.cancel:hover {
+  background-color: #f44336;
+}

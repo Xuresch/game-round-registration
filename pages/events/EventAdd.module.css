@@ -1,0 +1,158 @@
+.title {
+  font-size: 2em;
+  color: rgba(0, 0, 0, 0.87);
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+.content {
+  display: flex;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1em;
+}
+
+.label {
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  margin-bottom: 0.5em;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.input {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  padding: 0.5em;
+  border: none;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.42);
+  margin-bottom: 1em;
+  width: 100%;
+  box-sizing: border-box;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.input:focus {
+  outline: none;
+  border: 1px solid #ffc107;
+}
+
+.buttonWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.button {
+  background-color: #fff;
+  color: #607d8b;
+  text-decoration: none;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+  padding: 10px 16px;
+  border: 0px solid #607d8b;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  height: 42px;
+}
+
+.save:hover {
+  background-color: #8bc34a;
+}
+
+.cancel:hover {
+  background-color: #f44336;
+}
+
+.error {
+  color: #f44336;
+  margin-bottom: 1em;
+}
+
+.links {
+  position: absolute; /* positioning links */
+  top: 1em; /* positioning links */
+  right: 1em; /* positioning links */
+  text-align: center; /* centering links */
+}
+
+.timeSlot {
+  display: flex;
+  padding-top: 1em;
+  justify-content: space-evenly;
+}
+
+.timeSlotCard {
+  border: 1px solid #ccc;
+  position: relative; /* this line is important */
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+  margin: 1em;
+  padding: 1em;
+}
+
+/* create a section for mobile view */
+@media only screen and (max-width: 768px) {
+  .links {
+    position: relative;
+    top: 0em; /* positioning links */
+    right: 0em; /* positioning links */
+    margin: auto;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1em;
+  }
+  
+  .label {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 0.5em;
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .input {
+    font-family: "Roboto", sans-serif;
+    font-size: 1rem;
+    padding: 0.5em;
+    border: none;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.42);
+    margin-bottom: 1em;
+    width: 100%;
+    box-sizing: border-box;
+    color: rgba(0, 0, 0, 0.87);
+  }
+  
+  .input:focus {
+    outline: none;
+    border: 1px solid #ffc107;
+  }
+  
+  .buttonWrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .timeSlotCard {
+    margin: 1em 0em;
+  }
+
+  .timeSlot {
+    flex-direction: column;
+  }
+}

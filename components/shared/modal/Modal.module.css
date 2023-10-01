@@ -1,0 +1,56 @@
+/* The overlay that covers the entire screen */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  z-index: 100;
+}
+
+/* The content of the modal */
+.modalContent {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 500px;
+}
+
+/* The header of the modal */
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* The body of the modal */
+.modalBody {
+  margin-top: 10px;
+}
+
+/* The button to close the modal */
+.button {
+  background-color: #fff;
+  color: #607d8b;
+  text-decoration: none;
+  margin-top: 1em;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+  padding: 10px 16px;
+  border: 0px solid #607d8b;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  height: 42px;
+}
+
+.button:hover {
+  background-color: #ffc107;
+  color: #607d8b;
+}
