@@ -104,8 +104,8 @@ function UpdateGameRoundPage({
               value: `${start}-${end}`,
               label: `Von ${formatDateTime(start)} bis ${formatDateTime(end)}`,
             };
-            setTimeSlots(timeSlotsArray);
           });
+          setTimeSlots(timeSlotsArray);
         }
 
         setSelectedTimeSlot(`${startTime}-${endTime}`);
