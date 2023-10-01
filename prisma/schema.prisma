@@ -78,7 +78,7 @@ model Event {
   organizerId String
   Organizer   User        @relation(fields: [organizerId], references: [id])
   name        String
-  description String?
+  description String?     @db.LongText
   startDate   DateTime
   endDate     DateTime
   timeSlots   String? // Optional field to store timeslots as JSON string
@@ -95,10 +95,10 @@ model GameRound {
   gameMasterId        String
   GameMaster          User                 @relation(fields: [gameMasterId], references: [id])
   name                String
-  description         String?
+  description         String?              @db.LongText
   gameType            String // Roleplay, tabletop, boardgame
   gameSystem          String? // Only if gameType is 'roleplay'
-  genres              String?
+  genres              String?              @db.LongText
   recommendedAge      Int?
   startTime           DateTime
   endTime             DateTime
@@ -126,6 +126,7 @@ model Genre {
   id     Int              @id @default(autoincrement())
   code   String           @unique
   value  String
+  type   String?          // roleplay, tabletop, boardgame
   rounds GameRoundGenre[] // Relation to GameRoundGenre for many-to-many relationship
 }
 

@@ -8,9 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
-    "prisma:migrate:dev": "prisma migrate dev",
-    "prisma:migrate:test": "dotenv -e .env.test -- npx prisma migrate deploy",
-    "prisma:migrate:prod": "dotenv -e .env.production -- npx prisma migrate deploy",
+    "prisma:migrate:dev": "dotenv -e .env.local -- npx prisma migrate dev",
+    "prisma:deploy:dev": "dotenv -e .env.local -- npx prisma migrate deploy",
+    "prisma:deploy:test": "dotenv -e .env.test -- npx prisma migrate deploy",
+    "prisma:deploy:prod": "dotenv -e .env.production -- npx prisma migrate deploy",
     "prisma:purge": "prisma db push --force-reset",
     "prisma:seed": "node prisma/seed.js"
   },

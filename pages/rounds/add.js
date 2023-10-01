@@ -65,6 +65,7 @@ function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [errors, setErrors] = useState([]);
+  const [filteredGenres, setFilteredGenres] = useState(genres);
 
   useEffect(() => {
     async function fetchData() {
@@ -105,6 +106,19 @@ function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (gameRound.gameType === "roleplay") {
+      setFilteredGenres(genres.filter((genre) => genre.type === "roleplay"));
+    } else if (gameRound.gameType === "boardgame") {
+      setFilteredGenres(genres.filter((genre) => genre.type === "boardgame"));
+    } else if (gameRound.gameType === "tabletop") {
+      setFilteredGenres(genres.filter((genre) => genre.type === "tabletop"));
+    } else {
+      setFilteredGenres(genres);
+    }
+    // ... und so weiter für andere Typen
+  }, [gameRound.gameType]);
 
   async function sendRegistrationEmail(roundData) {
     try {
@@ -218,7 +232,7 @@ function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
         <MultiSelectModal
           isOpen={isModalOpen}
           onClose={() => setModalOpen(false)}
-          options={genres}
+          options={filteredGenres}
           initialSelectedOptions={selectedGenres}
           onChange={setSelectedGenres}
         />
@@ -266,10 +280,11 @@ function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
           <Dropdown
             label="Spieltyp"
             options={[
-              { value: "roleplay", label: "Roleplay" },
-              { value: "boardgame", label: "Boardgame" },
-              { value: "cardgame", label: "Cardgame" },
-              { value: "other", label: "Other" },
+              { value: "roleplay", label: "Rollenspiel" },
+              { value: "boardgame", label: "Brettspiel" },
+              { value: "tabletop", label: "Tabletop" },
+              { value: "tournament", label: "Turnier" },
+              { value: "other", label: "Andere" },
             ]}
             value={gameRound.gameType}
             onChange={(event) =>
