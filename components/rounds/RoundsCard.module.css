@@ -25,6 +25,7 @@
   color: rgba(0, 0, 0, 0.6);
   line-height: 20px;
   text-overflow: hidden;
+  white-space: pre-line;
 }
 
 /* Style for event description with ellipsis for overflow */
