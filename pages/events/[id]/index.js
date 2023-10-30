@@ -12,6 +12,7 @@ import ActionCard from "@/components/shared/actionCard/ActionCard";
 import useSessionApp from "@/hooks/useSessionApp";
 import ActionButtons from "@/components/shared/actionButton/actionButton";
 import { getEventGameRounds } from "@/lib/rounds/roundsService";
+import ConfirmationModal from "@/components/shared/modal/confirmationModal";
 
 function Loading() {
   return (
@@ -67,6 +68,8 @@ function EventPage({ eventId, rounds }) {
 
   const { isLoading, loadedSession, user } = useSessionApp();
 
+  const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
+
   useEffect(() => {
     if (!deleteEventLoading && !deleteEventError && deleteEventData) {
       router.push(`${env.BASE_URL}/events`);
@@ -98,6 +101,14 @@ function EventPage({ eventId, rounds }) {
 
   return (
     <Card>
+      {isConfirmationModalOpen && (
+        <ConfirmationModal
+          isOpen={isConfirmationModalOpen}
+          onClose={() => setConfirmationModalOpen(false)}
+          deleteObject={event.name}
+          onDelete={handleDelete}
+        />
+      )}
       <div className={styles.header}>
         <h2 className={styles.title}>{event.name}</h2>
         {loadedSession &&
@@ -107,7 +118,7 @@ function EventPage({ eventId, rounds }) {
               user={user}
               ownerId={event.organizerId}
               handleUpdate={handleUpdate}
-              handleDelete={handleDelete}
+              handleDelete={() => setConfirmationModalOpen(true)}
             />
           )}
       </div>

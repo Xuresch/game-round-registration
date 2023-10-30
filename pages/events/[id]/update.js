@@ -15,6 +15,8 @@ import { getSession } from "next-auth/react";
 import prisma from "@/lib/prisma";
 import Select from "react-select";
 import ButtonGroup from "@/components/shared/actionButton/buttonGroupComponent";
+import ConfirmationModal from "@/components/shared/modal/confirmationModal";
+import ActionButtons from "@/components/shared/actionButton/actionButton";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -122,6 +124,8 @@ function UpdateEventPage({ eventId }) {
   const [loadedSession, setLoadedSession] = useState(null); // Local state to store session data
   const [user, setUser] = useState(null); // Local state to store user data
 
+  const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
+
   useEffect(() => {
     getSession().then((session) => {
       if (session) {
@@ -224,16 +228,22 @@ function UpdateEventPage({ eventId }) {
 
   return (
     <Card>
+      {isConfirmationModalOpen && (
+        <ConfirmationModal
+          isOpen={isConfirmationModalOpen}
+          onClose={() => setConfirmationModalOpen(false)}
+          deleteObject={event.name}
+          onDelete={handleDelete}
+        />
+      )}
       <div className={styles.header}>
         <h2 className={styles.title}>Update Event {event.name}</h2>
-        <div className={styles.links}>
-          <button
-            onClick={handleDelete}
-            className={`${styles.button} ${styles.cancel}`}
-          >
-            <FontAwesomeIcon icon={faTrashCan} size="lg" />
-          </button>
-        </div>
+        <ActionButtons
+          loadedSession={loadedSession}
+          user={user}
+          ownerId={event.organizerId}
+          handleDelete={() => setConfirmationModalOpen(true)}
+        />
       </div>
       <div className={styles.content}>
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>

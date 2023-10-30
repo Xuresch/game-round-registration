@@ -16,6 +16,7 @@ import ActionButtons from "@/components/shared/actionButton/actionButton";
 import useSessionApp from "@/hooks/useSessionApp";
 import Dropdown from "@/components/shared/intput/dropdown";
 import { set } from "date-fns";
+import ConfirmationModal from "@/components/shared/modal/confirmationModal";
 
 function UpdateUserPage({ fetchedUserData, user }) {
   const router = useRouter();
@@ -26,6 +27,9 @@ function UpdateUserPage({ fetchedUserData, user }) {
   const [deleteUserLoading, setDeleteUserLoading] = useState(false);
   const [deleteUserError, setDeleteUserError] = useState(null);
   const [deleteUserData, setDeleteUserData] = useState(null);
+
+  const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
+
 
   const onSubmit = async (data) => {
     data.preventDefault();
@@ -68,13 +72,21 @@ function UpdateUserPage({ fetchedUserData, user }) {
 
   return (
     <Card>
+      {isConfirmationModalOpen && (
+        <ConfirmationModal
+          isOpen={isConfirmationModalOpen}
+          onClose={() => setConfirmationModalOpen(false)}
+          deleteObject={fetchedUserData.userName}
+          onDelete={handleDelete}
+        />
+      )}
       <section className={styles.header}>
         <h1 className={styles.title}>Update User {fetchedUserData.userName}</h1>
         <ActionButtons
           loadedSession={loadedSession}
           user={user}
           ownerId={userData.id}
-          handleDelete={handleDelete}
+          handleDelete={() => setConfirmationModalOpen(true)}
         />
       </section>
       <section className={styles.content}>
