@@ -22,6 +22,23 @@ function RoundPage({ rounds }) {
   const [loadedSession, setLoadedSession] = useState(null); // Local state to store session data
   const [user, setUser] = useState(null); // Local state to store user data
 
+  const [upcomingEvents, setUpcomingEvents] = useState([]); // Local state to store upcoming events
+  const [pastEvents, setPastEvents] = useState([]); // Local state to store past events
+
+  // filter and sort events into upcoming and past events
+  useEffect(() => {
+    if (rounds) {
+      const upcoming = rounds.filter((round) => {
+        return new Date(round.endTime) >= new Date();
+      });
+      const past = rounds.filter((round) => {
+        return new Date(round.endTime) < new Date();
+      });
+      setUpcomingEvents(upcoming);
+      setPastEvents(past);
+    }
+  }, [rounds]);
+
   useEffect(() => {
     getSession().then((session) => {
       if (session) {
@@ -35,17 +52,32 @@ function RoundPage({ rounds }) {
 
   return (
     <>
-      <div className={styles.gameRoundsContainer}>
-        {rounds?.map((round) => (
-          <GameRound key={round.id} round={round} />
-        ))}
-        {loadedSession && (
-          <ActionCard
-            title="Neue Spielrunde hinzufügen!"
-            onClickHandler={handleAddRoundClick}
-          />
-        )}
-      </div>
+      <section className={styles.gameRoundsSection}>
+        <div className={styles.gameRoundsHeader}>
+          <h1>Kommende Spielrunden</h1>
+        </div>
+        <div className={styles.gameRoundsContainer}>
+          {upcomingEvents?.map((round) => (
+            <GameRound key={round.id} round={round} />
+          ))}
+          {loadedSession && (
+            <ActionCard
+              title="Neue Spielrunde hinzufügen!"
+              onClickHandler={handleAddRoundClick}
+            />
+          )}
+        </div>
+      </section>
+      <section className={styles.gameRoundsSection}>
+        <div className={styles.gameRoundsHeader}>
+          <h1>Beendete Spielrunden</h1>
+        </div>
+        <div className={styles.gameRoundsContainer}>
+          {pastEvents?.map((round) => (
+            <GameRound key={round.id} round={round} />
+          ))}
+        </div>
+      </section>
     </>
   );
 }

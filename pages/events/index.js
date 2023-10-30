@@ -35,6 +35,22 @@ function EventsPage({ events }) {
   const [isLoading, setIsLoading] = useState(true); // Local state to toggle loading state
   const [loadedSession, setLoadedSession] = useState(null); // Local state to store session data
   const [user, setUser] = useState(null); // Local state to store user data
+  const [upcomingEvents, setUpcomingEvents] = useState([]); // Local state to store upcoming events
+  const [pastEvents, setPastEvents] = useState([]); // Local state to store past events
+
+  // filter and sort events into upcoming and past events
+  useEffect(() => {
+    if (events) {
+      const upcoming = events.filter((event) => {
+        return new Date(event.endDate) >= new Date();
+      });
+      const past = events.filter((event) => {
+        return new Date(event.endDate) < new Date();
+      });
+      setUpcomingEvents(upcoming);
+      setPastEvents(past);
+    }
+  }, [events]);
 
   useEffect(() => {
     getSession().then((session) => {
@@ -49,19 +65,35 @@ function EventsPage({ events }) {
 
   return (
     <>
-      <div className={styles.eventsContainer}>
-        {/* Loop through the events and render each one using the EventsCard component */}
-        {events.map((event) => (
-          <EventsCard key={event.id} event={event} />
-        ))}
-        {loadedSession &&
-          (user.role == "admin" || user.role == "organizer") && (
-            <ActionCard
-              title="Neue Veranstaltung hinzufügen!"
-              onClickHandler={handleAddEventClick}
-            />
-          )}
-      </div>
+      <section className={styles.eventsContainerSection}>
+        <div className={styles.eventsHeader}>
+          <h1>Kommende Veranstaltungen</h1>
+        </div>
+        <div className={styles.eventsContainer}>
+          {/* Loop through the events and render each one using the EventsCard component */}
+          {upcomingEvents.map((event) => (
+            <EventsCard key={event.id} event={event} />
+          ))}
+          {loadedSession &&
+            (user.role == "admin" || user.role == "organizer") && (
+              <ActionCard
+                title="Neue Veranstaltung hinzufügen!"
+                onClickHandler={handleAddEventClick}
+              />
+            )}
+        </div>
+      </section>
+      <section className={styles.eventsContainerSection}>
+        <div className={styles.eventsHeader}>
+          <h1>Beendete Veranstaltungen</h1>
+        </div>
+        <div className={styles.eventsContainer}>
+          {/* Loop through the events and render each one using the EventsCard component */}
+          {pastEvents.map((event) => (
+            <EventsCard key={event.id} event={event} />
+          ))}
+        </div>
+      </section>
     </>
   );
 }
