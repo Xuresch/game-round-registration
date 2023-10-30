@@ -131,7 +131,7 @@ function EventPage({ eventId, rounds }) {
             <b>Ende:</b> {displayEndDate} Uhr
           </p>
           <p className={styles.text}>
-            <b>Location:</b> Jugendhaus Sillenbuch {event.location}
+            <b>Veranstaltungsort:</b> {event.location}
           </p>
         </div>
         <div className={styles.description}>

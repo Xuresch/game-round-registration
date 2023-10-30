@@ -11,7 +11,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { getSession } from "next-auth/react";
 import apiService from "@/lib/shared/apiService";
-import { format } from "date-fns";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -19,6 +18,7 @@ const schema = Yup.object().shape({
   description: Yup.string().required(),
   startDate: Yup.date().required(),
   endDate: Yup.date().required(),
+  location: Yup.string().required(),
   // Add validation rules for other fields...
 });
 
@@ -48,6 +48,7 @@ function CreateEventPage({ session }) {
       endDate: "",
       organizerId: "",
       timeSlots: [{ start: "", end: "" }],
+      location: "",
     },
   });
 
@@ -108,6 +109,7 @@ function CreateEventPage({ session }) {
       endDate: data.endDate,
       organizerId: user.id,
       timeSlots: arrayToJson(data.timeSlots),
+      location: data.location,
     };
     // console.log(data);
 
@@ -148,6 +150,20 @@ function CreateEventPage({ session }) {
               )}
             />
             {errors.name && <p className={styles.error}>Name is required</p>}
+          </label>
+
+          <label className={styles.label}>
+            Veranstaltingsort:
+            <Controller
+              control={control}
+              name="location"
+              render={({ field }) => (
+                <input className={styles.input} {...field} />
+              )}
+            />
+            {errors.location && (
+              <p className={styles.error}>location is required</p>
+            )}
           </label>
 
           <label className={styles.label}>

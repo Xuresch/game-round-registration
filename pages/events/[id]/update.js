@@ -24,6 +24,7 @@ const schema = Yup.object().shape({
   description: Yup.string().required(),
   startDate: Yup.date().required(),
   endDate: Yup.date().required(),
+  location: Yup.string().required(),
   // Add validation rules for other fields...
 });
 
@@ -91,6 +92,7 @@ function UpdateEventPage({ eventId }) {
       endDate: "",
       organizerId: "",
       timeSlots: [{ start: "", end: "" }],
+      location: "",
     },
   });
 
@@ -183,6 +185,7 @@ function UpdateEventPage({ eventId }) {
       endDate: formatISO(new Date(data.endDate)),
       organizerId: data.organizerId,
       timeSlots: arrayToJson(data.timeSlots),
+      location: data.location,
     };
     // console.log(data);
     try {
@@ -303,6 +306,20 @@ function UpdateEventPage({ eventId }) {
               )}
             />
             {errors.name && <p className={styles.error}>Name is required</p>}
+          </label>
+
+          <label className={styles.label}>
+            Veranstaltingsort:
+            <Controller
+              control={control}
+              name="location"
+              render={({ field }) => (
+                <input className={styles.input} {...field} />
+              )}
+            />
+            {errors.location && (
+              <p className={styles.error}>location is required</p>
+            )}
           </label>
 
           <label className={styles.label}>

@@ -20,6 +20,7 @@ const schema = Joi.object({
       )
     )
     .allow(null),
+  location: Joi.string(),
 });
 
 const getEvent = async (req, res) => {
