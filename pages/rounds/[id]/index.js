@@ -27,9 +27,13 @@ import ActionButtons from "@/components/shared/actionButton/actionButton";
 import InformationItem from "@/components/shared/informationItem/informationItem";
 import { getUser } from "@/lib/user/userService";
 import apiService from "@/lib/shared/apiService";
+import ConfirmationModal from "@/components/shared/modal/confirmationModal";
+import { tr } from "date-fns/locale";
 
 function DeteilRoundPage({ round, gameMaster, user }) {
   const router = useRouter();
+
+  const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
 
   const { isSessionLoading, loadedSession } = useSessionApp();
   const [playerRegistration, setPlayerRegistration] = useState(null);
@@ -79,7 +83,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
     }
   };
 
-  async function sendEmailDataPlayer(roundData, userData=user) {
+  async function sendEmailDataPlayer(roundData, userData = user) {
     try {
       const emailData = {
         templateName: "registNewPlayer",
@@ -207,7 +211,11 @@ function DeteilRoundPage({ round, gameMaster, user }) {
     }
   }
 
-  async function sendWaitinglistUpdateEmailDataGm(roundData, oldPlayerName, newPlayerName) {
+  async function sendWaitinglistUpdateEmailDataGm(
+    roundData,
+    oldPlayerName,
+    newPlayerName
+  ) {
     try {
       const emailData = {
         templateName: "waitinglistUpdateGm",
@@ -344,6 +352,14 @@ function DeteilRoundPage({ round, gameMaster, user }) {
 
   return (
     <Card>
+      {isConfirmationModalOpen && (
+        <ConfirmationModal
+          isOpen={isConfirmationModalOpen}
+          onClose={() => setConfirmationModalOpen(false)}
+          deleteObject={round.name}
+          onDelete={handleDelete}
+        />
+      )}
       <div className={styles.header}>
         <h2 className={styles.title}>{round.name}</h2>
         <InformationItem
@@ -358,7 +374,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
               user={user}
               ownerId={round.gameMasterId}
               handleUpdate={handleUpdate}
-              handleDelete={handleDelete}
+              handleDelete={() => setConfirmationModalOpen(true)}
             />
           )}
       </div>

@@ -41,6 +41,7 @@ import Togglebox from "@/components/shared/intput/togglebox";
 import GenresFormField from "@/components/rounds/genresFormField";
 import TimeSlotSelector from "@/components/rounds/timeSlotSelector";
 import StartTimeEndTimePicker from "@/components/rounds/startTimeEndTimePicker";
+import ConfirmationModal from "@/components/shared/modal/confirmationModal";
 
 // Define validation schema with Yup
 const schema = Yup.object().shape({
@@ -71,6 +72,7 @@ function UpdateGameRoundPage({
   const [deleteGameRoundError, setDeleteGameRoundError] = useState(null);
 
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
 
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [gameRound, setGameRound] = useState([]);
@@ -200,6 +202,11 @@ function UpdateGameRoundPage({
     }
   };
 
+  // Handler for update button click
+  const handleUpdate = () => {
+    router.push(`${env.BASE_URL}/rounds/${round.id}/update`);
+  };
+
   const handleCancel = async (event) => {
     event.preventDefault();
     router.push(`${env.BASE_URL}/rounds/${roundId}`);
@@ -244,13 +251,22 @@ function UpdateGameRoundPage({
           onChange={setSelectedGenres}
         />
       )}
+      {isConfirmationModalOpen && (
+        <ConfirmationModal
+          isOpen={isConfirmationModalOpen}
+          onClose={() => setConfirmationModalOpen(false)}
+          deleteObject={gameRound.name}
+          onDelete={handleDelete}
+        />
+      )}
       <div className={styles.header}>
         <h2 className={styles.title}>Update Spielrunde {gameRoundName}</h2>
         <ActionButtons
           loadedSession={loadedSession}
           user={user}
           ownerId={gameRound?.gameMasterId}
-          handleDelete={handleDelete}
+          handleUpdate={handleUpdate}
+          handleDelete={() => setConfirmationModalOpen(true)}
         />
       </div>
       <div className={styles.content}>

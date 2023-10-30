@@ -36,6 +36,9 @@ export default async function gameRoundsHandler(req, res) {
     if (eventId) {
       gameRounds = await prisma.gameRound.findMany({
         where: { eventId: eventId },
+        orderBy: {
+          startTime: "asc", // Sort events by startTime
+        },
         include: {
           GameRoundGenre: {
             include: {
@@ -52,6 +55,9 @@ export default async function gameRoundsHandler(req, res) {
       });
     } else {
       gameRounds = await prisma.gameRound.findMany({
+        orderBy: {
+          startTime: "asc", // Sort events by startTime
+        },
         include: {
           GameRoundGenre: {
             include: {

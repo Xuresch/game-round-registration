@@ -38,3 +38,4 @@ prisma/dev.db-journal
 prisma/dev.db
 prisma/migrations
 .env.test.s
+.aider*
