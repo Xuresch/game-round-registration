@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
 import Joi from "joi";
-
 import { validate } from "@/helpers/validate";
 
 const schema = Joi.object({
@@ -20,6 +19,7 @@ const schema = Joi.object({
       )
     )
     .allow(null),
+  reservedOnSiteSeats: Joi.number().integer().min(0),
 });
 
 const getEvent = async (req, res) => {
@@ -29,12 +29,17 @@ const getEvent = async (req, res) => {
   });
 
   if (!event) {
-    return res
-      .status(404)
-      .json({ message: `Event with the uuid ${eventId} not found!` });
+    return res.status(404).json({ message: `Event with id ${eventId} not found!` });
   }
 
-  event.timeSlots = JSON.parse(event.timeSlots);
+  // Versuchen, timeSlots als JSON zu parsen (falls vorhanden)
+  if (event.timeSlots) {
+    try {
+      event.timeSlots = JSON.parse(event.timeSlots);
+    } catch (e) {
+      event.timeSlots = null;
+    }
+  }
   return res.json(event);
 };
 
@@ -46,9 +51,7 @@ const updateEvent = async (req, res) => {
       where: { id: eventId },
       data: {
         ...req.body,
-        timeSlots: req.body.timeSlots
-          ? JSON.stringify(req.body.timeSlots)
-          : null,
+        timeSlots: req.body.timeSlots ? JSON.stringify(req.body.timeSlots) : null,
       },
     });
     return res.json(updatedEvent);
@@ -63,7 +66,6 @@ const deleteEvent = async (req, res) => {
   const deletedEvent = await prisma.event.delete({
     where: { id: eventId },
   });
-
   return res.json(deletedEvent);
 };
 

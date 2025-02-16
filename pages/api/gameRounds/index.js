@@ -1,6 +1,6 @@
+// pages/api/gameRounds/index.js
 import prisma from "@/lib/prisma";
 import Joi from "joi";
-
 import { validate } from "@/helpers/validate";
 
 const schema = Joi.object({
@@ -17,15 +17,7 @@ const schema = Joi.object({
   playerLimit: Joi.number().integer().required(),
   waitingList: Joi.boolean().required(),
   extraDetails: Joi.string().allow(null),
-  // extraDetails: Joi.object().pattern(
-  //   Joi.string(),
-  //   Joi.alternatives().try(
-  //     Joi.string(),
-  //     Joi.number(),
-  //     Joi.boolean(),
-  //     Joi.object()
-  //   )
-  // ),
+  isOnSiteOnlyRegistration: Joi.boolean() // NEUES FELD
 });
 
 export default async function gameRoundsHandler(req, res) {
@@ -48,6 +40,9 @@ export default async function gameRoundsHandler(req, res) {
             where: { status: "registered" },
             select: { id: true },
           },
+          Event: {
+            select: { reservedOnSiteSeats: true }
+          }
         },
       });
     } else {
@@ -64,14 +59,17 @@ export default async function gameRoundsHandler(req, res) {
             where: { status: "registered" },
             select: { id: true },
           },
+          Event: {
+            select: { reservedOnSiteSeats: true }
+          }
         },
       });
     }
-    // Parse the extraDetails for each gameRound
     const parsedGameRounds = gameRounds.map((gameRound) => ({
       ...gameRound,
       registeredPlayersCount: gameRound.PlayerRegistrations.length,
-      extraDetails: JSON.parse(gameRound.extraDetails),
+      extraDetails: gameRound.extraDetails ? JSON.parse(gameRound.extraDetails) : null,
+      reservedOnSiteSeats: gameRound.Event ? gameRound.Event.reservedOnSiteSeats : 0,
     }));
 
     res.json(parsedGameRounds);
@@ -86,15 +84,13 @@ export default async function gameRoundsHandler(req, res) {
     const newGameRound = await prisma.gameRound.create({
       data: {
         ...req.body,
-        genres: undefined, // Exclude genres from update
-        extraDetails: JSON.stringify(req.body.extraDetails),
+        genres: undefined,
+        extraDetails: req.body.extraDetails ? JSON.stringify(req.body.extraDetails) : null,
       },
     });
 
     if (req.body.genres !== null) {
       const genreCodes = req.body.genres.split(",");
-
-      // Add new genre associations for the game round
       for (const genreCode of genreCodes) {
         const genre = await prisma.genre.findUnique({
           where: { code: genreCode },

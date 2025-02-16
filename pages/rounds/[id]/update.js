@@ -41,8 +41,9 @@ import Togglebox from "@/components/shared/intput/togglebox";
 import GenresFormField from "@/components/rounds/genresFormField";
 import TimeSlotSelector from "@/components/rounds/timeSlotSelector";
 import StartTimeEndTimePicker from "@/components/rounds/startTimeEndTimePicker";
+import { reactProductionProfiling } from "@/next.config";
 
-// Define validation schema with Yup
+// Define validation schema with Yup (neu: isOnSiteOnlyRegistration)
 const schema = Yup.object().shape({
   name: Yup.string().required(),
   description: Yup.string(),
@@ -54,6 +55,7 @@ const schema = Yup.object().shape({
   recommendedAge: Yup.number().positive().min(0),
   playerLimit: Yup.number().required().positive().min(0),
   waitingList: Yup.bool().required(),
+  isOnSiteOnlyRegistration: Yup.bool(),
 });
 
 function UpdateGameRoundPage({
@@ -62,6 +64,7 @@ function UpdateGameRoundPage({
   user,
   eventTimeSlots,
   genres,
+  reservedOnSiteSeats,
 }) {
   const router = useRouter();
 
@@ -73,31 +76,37 @@ function UpdateGameRoundPage({
   const [isModalOpen, setModalOpen] = useState(false);
 
   const [selectedGenres, setSelectedGenres] = useState([]);
-  const [gameRound, setGameRound] = useState([]);
+  const [gameRound, setGameRound] = useState({});
   const [gameRoundName, setGameRoundName] = useState("");
   const [timeSlots, setTimeSlots] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState({});
   const [filteredGenres, setFilteredGenres] = useState(genres);
 
   useEffect(() => {
     async function fetchGameRound() {
-      const gameRound = await getGameRound(roundId);
-      setGameRound(gameRound);
-      setSelectedGenres(gameRound.genres);
-      setGameRoundName(gameRound.name);
+      const gameRoundData = await getGameRound(roundId);
+      // Falls das neue Feld nicht gesetzt ist, default auf false
+      gameRoundData.genres = gameRoundData.GameRoundGenre.map((g) => {
+        return g.genre
+      })
+      console.log(gameRoundData)
+      gameRoundData.isOnSiteOnlyRegistration =
+        gameRoundData.isOnSiteOnlyRegistration || false;
+      setGameRound(gameRoundData);
+      setSelectedGenres(gameRoundData.genres);
+      setGameRoundName(gameRoundData.name);
 
       const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       // Convert the dates to the user's timezone and format them
-      const startTime = formatToUserTimezone(gameRound.startTime, userTimezone);
-      const endTime = formatToUserTimezone(gameRound.endTime, userTimezone);
-
-      setStartTime(startTime);
-      setEndTime(endTime);
+      const st = formatToUserTimezone(gameRoundData.startTime, userTimezone);
+      const et = formatToUserTimezone(gameRoundData.endTime, userTimezone);
+      setStartTime(st);
+      setEndTime(et);
       if (eventTimeSlots != null) {
-        if (eventTimeSlots.slot_1.start != "") {
+        if (eventTimeSlots.slot_1.start !== "") {
           const timeSlotsArray = Object.keys(eventTimeSlots).map((key) => {
             const { start, end } = eventTimeSlots[key];
             return {
@@ -107,8 +116,7 @@ function UpdateGameRoundPage({
           });
           setTimeSlots(timeSlotsArray);
         }
-
-        setSelectedTimeSlot(`${startTime}-${endTime}`);
+        setSelectedTimeSlot(`${st}-${et}`);
       }
     }
 
@@ -147,13 +155,13 @@ function UpdateGameRoundPage({
         abortEarly: false, // Prevent aborting validation after first error
       })
       .catch((err) => {
-        const errors = err.inner.reduce((acc, error) => {
+        const errs = err.inner.reduce((acc, error) => {
           return {
             ...acc,
             [error.path]: true,
           };
         }, {});
-        setErrors(errors);
+        setErrors(errs);
       });
 
     if (!schema.isValidSync(gameRound)) {
@@ -180,10 +188,11 @@ function UpdateGameRoundPage({
       playerLimit: +gameRound.playerLimit,
       waitingList: gameRound.waitingList,
       extraDetails: gameRound.extraDetails,
+      isOnSiteOnlyRegistration: gameRound.isOnSiteOnlyRegistration, // NEUES FELD
     };
 
     console.log(payload);
-    updateGameRound(roundId, payload);
+    await updateGameRound(roundId, payload);
     router.push(`${env.BASE_URL}/rounds/${roundId}`);
   };
 
@@ -225,8 +234,6 @@ function UpdateGameRoundPage({
     return `${day}.${month}.${year} ${hours}:${minutes}`;
   }
 
-  // console.log(selectedGenres.map((genre) => genre.code));
-
   function handleDeleteGenre(genreToDelete) {
     setSelectedGenres(
       selectedGenres.filter((genre) => genre.code !== genreToDelete.code)
@@ -252,10 +259,15 @@ function UpdateGameRoundPage({
           ownerId={gameRound?.gameMasterId}
           handleDelete={handleDelete}
         />
+                {gameRound.eventId && (
+          <p className={styles.infoText}>
+            Hinweis: Für dieses Event sind {reservedOnSiteSeats} Plätze reserviert, die online nicht buchbar sind.
+          </p>
+        )}
       </div>
       <div className={styles.content}>
         <form className={styles.form} onSubmit={onSubmit}>
-          {loadedSession && user.role == "admin" && (
+          {loadedSession && user.role === "admin" && (
             <>
               <TextInput
                 label="UUID"
@@ -327,7 +339,7 @@ function UpdateGameRoundPage({
             }
             error={
               errors.recommendedAge
-                ? "Empfolenes Alter darf nicht negativ sein!"
+                ? "Empfohlenes Alter darf nicht negativ sein!"
                 : null
             }
           />
@@ -339,7 +351,7 @@ function UpdateGameRoundPage({
             }
             error={
               errors.playerLimit
-                ? "Spieler limit darf nicht negativ sein!"
+                ? "Spieler Limit darf nicht negativ sein!"
                 : null
             }
           />
@@ -367,6 +379,18 @@ function UpdateGameRoundPage({
               setGameRound({ ...gameRound, waitingList: event.target.checked })
             }
           />
+          {gameRound.eventId && (<Togglebox
+            label="Nur vor Ort Anmeldung"
+            checked={gameRound.isOnSiteOnlyRegistration}
+            onChange={(event) =>
+              setGameRound({ ...gameRound, isOnSiteOnlyRegistration: event.target.checked })
+            }
+          />)}
+          {gameRound.isOnSiteOnlyRegistration && gameRound.eventId && (
+            <p className={styles.infoText}>
+              Hinweis: Diese Spielrunde wird ausschließlich vor Ort registriert. Online-Anmeldungen sind deaktiviert.
+            </p>
+          )}
           <ButtonGroup
             handleCancel={handleCancel}
             saveButtonText="Runde aktualisieren"
@@ -386,6 +410,7 @@ export async function getServerSideProps(context) {
     // Get the user from the session
     const sessionGet = await getSession({ req: context.req });
     const user = sessionGet?.user || null;
+    let reservedOnSiteSeats = 0;
 
     // Fetch round details
     const round = await getGameRound(roundId);
@@ -397,9 +422,11 @@ export async function getServerSideProps(context) {
     let eventTimeSlots = null;
     if (round.eventId != null) {
       const event = await getEvent(round.eventId);
+      reservedOnSiteSeats = event.reservedOnSiteSeats || 0;
       eventTimeSlots = event.timeSlots;
     }
 
+    
     // Fetch genres
     const genres = await getGenre();
 
@@ -412,6 +439,7 @@ export async function getServerSideProps(context) {
           user,
           eventTimeSlots,
           genres,
+          reservedOnSiteSeats,
         },
       };
     }
@@ -434,7 +462,6 @@ export async function getServerSideProps(context) {
       };
     }
   } catch (error) {
-    // Log any errors and return a 404 page
     console.error("Error fetching data:", error);
     return {
       notFound: true,

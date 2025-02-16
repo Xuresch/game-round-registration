@@ -374,12 +374,12 @@ function DeteilRoundPage({ round, gameMaster, user }) {
               <b>Genres:</b>
             </label>
             <div className={styles.genreContainer}>
-              {round.genres.map((genre) => (
-                <span key={genre.id}>{genre.value}</span>
+              {round.GameRoundGenre.map((g) => (
+                <span key={g.genre.id}>{g.genre.value}</span>
+                
               ))}
             </div>
           </div>
-          <InformationItem label="Genre" value={round.genre} />
           <InformationItem
             label="Altersempfehlung"
             value={`${round.recommendedAge} Jahre`}
@@ -420,7 +420,7 @@ export async function getServerSideProps(context) {
     const user = sessionGet?.user || null;
 
     const round = await getGameRound(id);
-
+    
     // Fetch gameMaster details
     const gameMaster = await getUser(round.gameMasterId);
 
