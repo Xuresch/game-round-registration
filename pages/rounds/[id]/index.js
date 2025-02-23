@@ -1,11 +1,8 @@
-// External libraries
+// pages/rounds/[id]/index.js
 import { useEffect, useState } from "react";
-
-// Next.js related
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
-// Local module imports
 import Card from "@/components/shared/card/card";
 import useSessionApp from "@/hooks/useSessionApp";
 import { env } from "@/helpers/env";
@@ -20,7 +17,6 @@ import {
 } from "@/lib/rounds/playerRegistrationService";
 import { deleteGameRound, getGameRound } from "@/lib/rounds/roundsService";
 
-// Styles
 import styles from "./Round.module.css";
 import { formatRoundDates } from "@/helpers/dateFormatter";
 import ActionButtons from "@/components/shared/actionButton/actionButton";
@@ -30,45 +26,42 @@ import apiService from "@/lib/shared/apiService";
 
 function DeteilRoundPage({ round, gameMaster, user }) {
   const router = useRouter();
-
   const { isSessionLoading, loadedSession } = useSessionApp();
+
   const [playerRegistration, setPlayerRegistration] = useState(null);
   const [deleteGameRoundLoading, setDeleteGameRoundLoading] = useState(false);
   const [deleteGameRoundData, setDeleteGameRoundData] = useState(null);
   const [deleteGameRoundError, setDeleteGameRoundError] = useState(null);
-  const [registeredPlayersCount, setRegisteredPlayersCount] = useState(
-    round.registeredPlayersCount
-  );
-
+  const [registeredPlayersCount, setRegisteredPlayersCount] = useState(round.registeredPlayersCount);
   const [players, setPlayers] = useState([]);
   const [waitingList, setWaitingList] = useState([]);
-
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    async function fetchPlayerRegistration() {
-      const registration = await getPlayerRegistration(user?.id, round.id);
-      setPlayerRegistration(registration);
-      const players = await getRegisteredPlayers(round.id);
-      setPlayers(players);
-      const waitingList = await getWaitingPlayers(round.id);
-      setWaitingList(waitingList);
-    }
+  // Berechnung verfügbarer Plätze (Spielerlimit minus reservierte Vor-Ort Plätze)
+  const availableSpots = round.playerLimit - (round.reservedOnSiteSeats || 0);
+  const spotsLeft = availableSpots - registeredPlayersCount;
 
-    fetchPlayerRegistration();
-  }, [isLoading]);
-
-  const handleUnregister = async () => {
-    await deletePlayerRegistration(playerRegistration.id);
-    setPlayerRegistration(null);
-    const oldestWaitingPlayer = await promoteOldestWaitingPlayer(round);
+  const updatePlayerRegistrations = async () => {
+    const registration = await getPlayerRegistration(user?.id, round.id);
+    setPlayerRegistration(registration);
     const players = await getRegisteredPlayers(round.id);
     setPlayers(players);
     const waitingList = await getWaitingPlayers(round.id);
     setWaitingList(waitingList);
-    if (waitingList.length === 0) {
-      setRegisteredPlayersCount((prevCount) => prevCount - 1);
+    setRegisteredPlayersCount(players.length);
+  };
+
+  useEffect(() => {
+    async function fetchPlayerRegistration() {
+      await updatePlayerRegistrations();
     }
+    fetchPlayerRegistration();
+  }, [isLoading, round.id, user]);
+
+  const handleUnregister = async () => {
+    await deletePlayerRegistration(playerRegistration.id);
+    const oldestWaitingPlayer = await promoteOldestWaitingPlayer(round);
+    await updatePlayerRegistrations();
     if (oldestWaitingPlayer) {
       sendEmailDataPlayer(round, oldestWaitingPlayer.Player);
       sendWaitinglistUpdateEmailDataGm(round, user, oldestWaitingPlayer.Player);
@@ -79,7 +72,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
     }
   };
 
-  async function sendEmailDataPlayer(roundData, userData=user) {
+  async function sendEmailDataPlayer(roundData, userData = user) {
     try {
       const emailData = {
         templateName: "registNewPlayer",
@@ -238,7 +231,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
     await registerPlayer(user.id, round.id, "registered");
     sendEmailDataPlayer(round);
     sendEmailDataGm(round);
-    setRegisteredPlayersCount((prevCount) => prevCount + 1);
+    await updatePlayerRegistrations();
   };
 
   const handleAddToWaitlist = async () => {
@@ -249,11 +242,11 @@ function DeteilRoundPage({ round, gameMaster, user }) {
     await registerPlayer(user.id, round.id, "waiting");
     sendWaitinglistEmailDataPlayer(round);
     sendWaitinglistEmailDataGm(round);
+    await updatePlayerRegistrations();
   };
 
   const handleButtonClick = async () => {
     setIsLoading(true);
-
     try {
       if (buttonLabel === "Abmelden") {
         await handleUnregister();
@@ -264,51 +257,16 @@ function DeteilRoundPage({ round, gameMaster, user }) {
       }
     } catch (err) {
       console.error(err);
-      // Possibly show an error message to the user
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handler for delete button click
-  const handleDelete = async () => {
-    setDeleteGameRoundLoading(true);
-    try {
-      const data = await deleteGameRound(round.id);
-      setDeleteGameRoundData(data);
-    } catch (error) {
-      setDeleteGameRoundError(error);
-    } finally {
-      setDeleteGameRoundLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (
-      !deleteGameRoundLoading &&
-      !deleteGameRoundError &&
-      deleteGameRoundData
-    ) {
-      router.push(`${env.BASE_URL}/events`);
-    }
-  }, [deleteGameRoundLoading, deleteGameRoundError, deleteGameRoundData]);
-
-  // Handler for update button click
-  const handleUpdate = () => {
-    router.push(`${env.BASE_URL}/rounds/${round.id}/update`);
-  };
-
-  const { displayStartDate, displayEndDate } = formatRoundDates(round);
-
   let buttonLabel = "";
   let buttonDisabled = false;
-
   if (playerRegistration && loadedSession) {
     buttonLabel = "Abmelden";
-  } else if (
-    round.registeredPlayersCount < round.playerLimit ||
-    !round.playerLimit
-  ) {
+  } else if (round.registeredPlayersCount < availableSpots || !round.playerLimit) {
     buttonLabel = "Registrieren";
   } else if (round.waitingList) {
     buttonLabel = "Zur Warteliste hinzufügen";
@@ -316,31 +274,44 @@ function DeteilRoundPage({ round, gameMaster, user }) {
     buttonLabel = "Spielrunde ist voll";
     buttonDisabled = true;
   }
+  if (round.isOnSiteOnlyRegistration) {
+    buttonDisabled = true;
+    buttonLabel = "Nur vor Ort Anmeldung";
+  }
 
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
   const displayRegisteredPlayersCount = () => {
+    let countContent;
     if (round.playerLimit > 0) {
-      return (
-        <InformationItem
-          label="Spieler Anzahl"
-          value={`${registeredPlayersCount} von ${round.playerLimit}`}
-        />
+      countContent = (
+        <>
+          {registeredPlayersCount} von {round.playerLimit}
+        </>
+      );
+    } else if (round.playerLimit === 0) {
+      countContent = (
+        <>
+          {registeredPlayersCount} von Unbegrenzt
+        </>
       );
     }
-    if (round.playerLimit == 0) {
-      return (
-        <InformationItem
-          label="Spieler Anzahl"
-          value={`${registeredPlayersCount} von Unbegrenzt`}
-        />
+    if (round.reservedOnSiteSeats > 0) {
+      countContent = (
+        <>
+          {countContent}{", "}
+          <span style={{ color: "#f44336" }}>
+            {round.reservedOnSiteSeats} vor Ort reserviert
+          </span>
+        </>
       );
-    } else {
-      return null;
     }
+    return <InformationItem label="Spieler Anzahl" value={countContent} />;
   };
+
+  const { displayStartDate, displayEndDate } = formatRoundDates(round);
 
   return (
     <Card>
@@ -352,13 +323,21 @@ function DeteilRoundPage({ round, gameMaster, user }) {
           value={gameMaster.data.userName}
         />
         {loadedSession &&
-          (user.id === round.gameMasterId || user.role == "admin") && (
+          (user.id === round.gameMasterId || user.role === "admin") && (
             <ActionButtons
               loadedSession={loadedSession}
               user={user}
               ownerId={round.gameMasterId}
-              handleUpdate={handleUpdate}
-              handleDelete={handleDelete}
+              handleUpdate={() =>
+                router.push(`${env.BASE_URL}/rounds/${round.id}/update`)
+              }
+              handleDelete={() => {
+                setDeleteGameRoundLoading(true);
+                deleteGameRound(round.id)
+                  .then((data) => setDeleteGameRoundData(data))
+                  .catch((error) => setDeleteGameRoundError(error))
+                  .finally(() => setDeleteGameRoundLoading(false));
+              }}
             />
           )}
       </div>
@@ -376,7 +355,6 @@ function DeteilRoundPage({ round, gameMaster, user }) {
             <div className={styles.genreContainer}>
               {round.GameRoundGenre.map((g) => (
                 <span key={g.genre.id}>{g.genre.value}</span>
-                
               ))}
             </div>
           </div>
@@ -385,6 +363,13 @@ function DeteilRoundPage({ round, gameMaster, user }) {
             value={`${round.recommendedAge} Jahre`}
           />
           {displayRegisteredPlayersCount()}
+          {spotsLeft === 0 ? (
+            <div className={`${styles.badge} ${styles.badgeFull}`}>Voll</div>
+          ) : spotsLeft <= availableSpots / 2 ? (
+            <div className={`${styles.badge} ${styles.badgeFew}`}>
+              Nur noch wenige Plätze verfügbar
+            </div>
+          ) : null}
           <InformationItem label="Beginn" value={`${displayStartDate} Uhr`} />
           <InformationItem label="Ende" value={`${displayEndDate} Uhr`} />
         </div>
@@ -396,11 +381,9 @@ function DeteilRoundPage({ round, gameMaster, user }) {
       <div className={styles.playerWrapper}></div>
       <div className={styles.buttonWrapper}>
         <button
-          className={`${styles.button} ${styles.save} ${
-            buttonDisabled ? styles.disabled : ""
-          }`}
+          className={`${styles.button} ${styles.save} ${buttonDisabled ? styles.disabled : ""}`}
           onClick={handleButtonClick}
-          disabled={buttonDisabled || isLoading} // disable button while loading
+          disabled={buttonDisabled || isLoading}
         >
           {isLoading ? "Laden..." : buttonLabel}
         </button>
@@ -410,31 +393,22 @@ function DeteilRoundPage({ round, gameMaster, user }) {
   );
 }
 
-export default DeteilRoundPage;
-
 export async function getServerSideProps(context) {
-  const { id } = context.params; // Extract the round ID from the context
-
+  const { id } = context.params;
   try {
     const sessionGet = await getSession({ req: context.req });
     const user = sessionGet?.user || null;
-
     const round = await getGameRound(id);
-    
-    // Fetch gameMaster details
     const gameMaster = await getUser(round.gameMasterId);
-
     return {
-      props: {
-        round,
-        gameMaster,
-        user,
-      },
+      props: { round, gameMaster, user },
     };
   } catch (error) {
     console.error("Error fetching data:", error);
     return {
-      notFound: true, // This will return a 404 page
+      notFound: true,
     };
   }
 }
+
+export default DeteilRoundPage;
