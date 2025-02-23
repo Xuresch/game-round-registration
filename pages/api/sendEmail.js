@@ -10,7 +10,6 @@ export default async function handler(req, res) {
 
     // Use the template selector to get the populated MJML content
     const mjmlContent = selectTemplate(templateName, templateData);
-
     // Convert MJML to HTML
     const { html } = mjml2html(mjmlContent);
 

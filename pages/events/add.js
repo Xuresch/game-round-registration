@@ -1,3 +1,4 @@
+// pages/events/add.js
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -19,7 +20,8 @@ const schema = Yup.object().shape({
   description: Yup.string().required(),
   startDate: Yup.date().required(),
   endDate: Yup.date().required(),
-  // Add validation rules for other fields...
+  // Neue Validierung kann bei Bedarf hinzugefügt werden, z.B. für reservedOnSiteSeats:
+  reservedOnSiteSeats: Yup.number().min(0),
 });
 
 function CreateEventPage({ session }) {
@@ -48,6 +50,7 @@ function CreateEventPage({ session }) {
       endDate: "",
       organizerId: "",
       timeSlots: [{ start: "", end: "" }],
+      reservedOnSiteSeats: 0,
     },
   });
 
@@ -84,7 +87,7 @@ function CreateEventPage({ session }) {
         templateName: "eventCreation",
         templateData: {
           name: user.userName,
-          // date: eventData.startDate,
+          date: eventData.startDate,
           eventName: eventData.name,
           eventUrl: `${env.BASE_URL}/events/${eventData.id}`,
         },
@@ -101,18 +104,18 @@ function CreateEventPage({ session }) {
   }
 
   const onSubmit = async (data) => {
-    data = {
+    const payload = {
       name: data.name,
       description: data.description,
       startDate: data.startDate,
       endDate: data.endDate,
       organizerId: user.id,
       timeSlots: arrayToJson(data.timeSlots),
+      reservedOnSiteSeats: data.reservedOnSiteSeats,
     };
-    // console.log(data);
 
     try {
-      await createEvent(data);
+      await createEvent(payload);
     } catch (err) {
       console.error(err);
     }
@@ -123,7 +126,7 @@ function CreateEventPage({ session }) {
     router.push(`${env.BASE_URL}/events`);
   };
 
-  // handle response from the PUT request
+  // handle response from the POST request
   useEffect(() => {
     if (!createEventError && !createEventLoading && createdEventData) {
       sendRegistrationEmail(createdEventData);
@@ -170,11 +173,7 @@ function CreateEventPage({ session }) {
               control={control}
               name="startDate"
               render={({ field }) => (
-                <input
-                  className={styles.input}
-                  type="datetime-local"
-                  {...field}
-                />
+                <input className={styles.input} type="datetime-local" {...field} />
               )}
             />
             {errors.startDate && (
@@ -188,15 +187,24 @@ function CreateEventPage({ session }) {
               control={control}
               name="endDate"
               render={({ field }) => (
-                <input
-                  className={styles.input}
-                  type="datetime-local"
-                  {...field}
-                />
+                <input className={styles.input} type="datetime-local" {...field} />
               )}
             />
             {errors.endDate && (
               <p className={styles.error}>End Date is required</p>
+            )}
+          </label>
+          <label className={styles.label}>
+            Reservierte Vor-Ort Plätze:
+            <Controller
+              control={control}
+              name="reservedOnSiteSeats"
+              render={({ field }) => (
+                <input className={styles.input} type="number" {...field} />
+              )}
+            />
+            {errors.reservedOnSiteSeats && (
+              <p className={styles.error}>Reservierte Vor-Ort Plätze is required</p>
             )}
           </label>
 
@@ -262,10 +270,7 @@ function CreateEventPage({ session }) {
             <button className={`${styles.button} ${styles.save}`} type="submit">
               Event speichern
             </button>
-            <button
-              onClick={handleCancel}
-              className={`${styles.button} ${styles.cancel}`}
-            >
+            <button onClick={handleCancel} className={`${styles.button} ${styles.cancel}`}>
               Abbrechen
             </button>
           </div>

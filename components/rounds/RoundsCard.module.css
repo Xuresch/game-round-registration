@@ -1,6 +1,6 @@
 .roundsCard {
   border: 1px solid #ccc;
-  position: relative; /* this line is important */
+  position: relative;
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
@@ -16,7 +16,7 @@
   font-size: 1.5em;
   color: rgba(0, 0, 0, 0.87);
   text-align: center;
-  margin-bottom: 2em;
+  margin-bottom: 1em;
 }
 
 /* Generic text style */
@@ -100,7 +100,48 @@
 }
 
 .genreContainer {
-  /* display: flex;
-  flex-direction: column; */
   margin-left: 4px;
+}
+
+/* Center the badge container */
+.badgeContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Badge styles */
+.badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* When round is full */
+.badgeFull {
+  background-color: #f44336; /* Red background */
+  color: #fff;
+}
+
+/* When waiting list is open */
+.badgeWaiting {
+  background-color: #ff9800; /* Orange background */
+  color: #fff;
+}
+
+/* When only few spots available */
+.badgeFew {
+  background-color: #ffc107; /* Amber background */
+  color: #fff;
+}
+
+/* For registered players count text when full */
+.fullText {
+  color: #f44336; /* Red text */
+}
+
+.amberText {
+  color: #FFC107; /* Amber */
 }

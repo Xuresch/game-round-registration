@@ -17,6 +17,13 @@
   padding: 1em;
 }
 
+.infoText {
+  color: #d32f2f; /* Auffälliges Rot */
+  font-weight: bold;
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
 /* create a section for mobile view */
 @media only screen and (max-width: 768px) {
   .form {

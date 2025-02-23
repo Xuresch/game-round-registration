@@ -40,7 +40,7 @@ function GameRound({ round }) {
     loading: deleteGameRoundLoading,
     error: deleteGameRoundError,
   } = useApiRequest(
-    `${env.BASE_API_URL}/gameRounds/${round.id}`, // Use environment variable
+    `${env.BASE_API_URL}/gameRounds/${round.id}`,
     "DELETE",
     false
   );
@@ -69,24 +69,31 @@ function GameRound({ round }) {
     router.push(`${env.BASE_URL}/rounds/${round.id}/update`);
   };
 
+  // Function to display registered players count with conditional styling.
   const displayRegisteredPlayersCount = () => {
+    let countText = "";
     if (round.playerLimit > 0) {
-      return (
-        <ContentElement>
-          <b>Spieler Anzahl:</b> {round.registeredPlayersCount} von{" "}
-          {round.playerLimit}
-        </ContentElement>
-      );
+      countText = `${round.registeredPlayersCount} von ${round.playerLimit}`;
+    } else if (round.playerLimit === 0) {
+      countText = `${round.registeredPlayersCount} von Unbegrenzt`;
     }
-    if (round.playerLimit == 0) {
-      return (
-        <ContentElement>
-          <b>Spieler Anzahl:</b> {round.registeredPlayersCount}
-        </ContentElement>
-      );
-    } else {
-      return null;
+    // Determine if the round is full or nearly full (amber condition)
+    const isFull = round.playerLimit > 0 && round.registeredPlayersCount >= round.playerLimit || round.playerLimit > 0 && round.waitingList && spotsLeft === 0;
+    const isAmber = !isFull && (spotsLeft <= availableSpots / 2 && spotsLeft > 0);
+    
+    let textClass = "";
+    if (isFull) {
+      textClass = styles.fullText;
+    } else if (isAmber) {
+      textClass = styles.amberText;
     }
+  
+    return (
+      <ContentElement>
+        <b>Spieler Anzahl:</b>{" "}
+        <span className={textClass}>{countText}</span>
+      </ContentElement>
+    );
   };
 
   const displayRecommendedAge = () => {
@@ -101,9 +108,56 @@ function GameRound({ round }) {
     }
   };
 
+  // Calculate available spots and spots left
+  const availableSpots = round.playerLimit - (round.reservedOnSiteSeats || 0);
+  const spotsLeft = availableSpots - round.registeredPlayersCount;
+
+  // Badge element to show full or few spots info, centered below the title.
+  const renderBadge = () => {
+    if (round.isOnSiteOnlyRegistration) {
+      return (
+        <div className={styles.badgeContainer}>
+          <div className={`${styles.badge} ${styles.badgeFull}`}>
+            Nur vor Ort Anmeldung
+          </div>
+        </div>
+      );
+    }
+
+    switch (true) {
+      case round.playerLimit > 0 && round.waitingList && spotsLeft === 0:
+        return (
+          <div className={styles.badgeContainer}>
+            <div className={`${styles.badge} ${styles.badgeWaiting}`}>
+              Spielrunde ist Voll! – Warteliste offen
+            </div>
+          </div>
+        );
+      case round.playerLimit > 0 && spotsLeft === 0:
+        return (
+          <div className={styles.badgeContainer}>
+            <div className={`${styles.badge} ${styles.badgeFull}`}>
+              Spielrunde ist Voll!
+            </div>
+          </div>
+        );
+      case spotsLeft <= availableSpots / 2 && spotsLeft > 0:
+        return (
+          <div className={styles.badgeContainer}>
+            <div className={`${styles.badge} ${styles.badgeFew}`}>
+              Nur noch wenige Plätze verfügbar!
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <SmallCard>
       <h2 className={styles.title}>{round.name}</h2>
+      {renderBadge()}
       <ContentElement>{trimText(round.description, 150)}</ContentElement>
       <div className={styles.time}>
         <ContentElement title="Start:">
@@ -126,8 +180,7 @@ function GameRound({ round }) {
       </div>
 
       <ContentElement>
-        <b>Type:</b>{" "}
-        {round.gameType.charAt(0).toUpperCase() + round.gameType.slice(1)}
+        <b>Type:</b> {round.gameType.charAt(0).toUpperCase() + round.gameType.slice(1)}
       </ContentElement>
       {round.gameSystem && (
         <ContentElement>
@@ -137,14 +190,9 @@ function GameRound({ round }) {
       {displayRegisteredPlayersCount()}
       {displayRecommendedAge()}
 
-      {/* {round.extraDetails && (
-        <ContentElement>
-          <b>Zusätzliche Deteils:</b> {round.extraDetails}
-        </ContentElement>
-      )} */}
       <div className={styles.links}>
         {loadedSession &&
-          (user.id === round.gameMasterId || user.role == "admin") && (
+          (user.id === round.gameMasterId || user.role === "admin") && (
             <button
               onClick={handleUpdate}
               className={`${styles.button} ${styles.edit}`}
@@ -159,7 +207,7 @@ function GameRound({ round }) {
           mehr erfahren
         </Link>
         {loadedSession &&
-          (user.id === round.gameMasterId || user.role == "admin") && (
+          (user.id === round.gameMasterId || user.role === "admin") && (
             <button
               onClick={handleDelete}
               className={`${styles.button} ${styles.delete}`}

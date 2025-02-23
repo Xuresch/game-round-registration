@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
 import Joi from "joi";
-
 import { validate } from "@/helpers/validate";
 
 const schema = Joi.object({
@@ -20,22 +19,20 @@ const schema = Joi.object({
       )
     )
     .allow(null),
+  reservedOnSiteSeats: Joi.number().integer().min(0)
 });
 
 export default async function eventsHandler(req, res) {
   if (req.method === "GET") {
     const events = await prisma.event.findMany({
       orderBy: {
-        startDate: "asc", // Sort events by startDate
+        startDate: "asc",
       },
     });
-
-    // Parse the timeSlots for each event
     const parsedEvents = events.map((event) => ({
       ...event,
-      timeSlots: JSON.parse(event.timeSlots),
+      timeSlots: event.timeSlots ? JSON.parse(event.timeSlots) : null,
     }));
-
     res.json(parsedEvents);
   } else if (req.method === "POST") {
     try {
@@ -48,9 +45,7 @@ export default async function eventsHandler(req, res) {
     const newEvent = await prisma.event.create({
       data: {
         ...req.body,
-        timeSlots: req.body.timeSlots
-          ? JSON.stringify(req.body.timeSlots)
-          : null,
+        timeSlots: req.body.timeSlots ? JSON.stringify(req.body.timeSlots) : null,
       },
     });
 

@@ -1,3 +1,4 @@
+// pages/events/[id]/update.js
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -16,13 +17,13 @@ import prisma from "@/lib/prisma";
 import Select from "react-select";
 import ButtonGroup from "@/components/shared/actionButton/buttonGroupComponent";
 
-// Define validation schema with Yup
+// Neues Feld in das Validierungsschema einfügen
 const schema = Yup.object().shape({
   name: Yup.string().required(),
   description: Yup.string().required(),
   startDate: Yup.date().required(),
   endDate: Yup.date().required(),
-  // Add validation rules for other fields...
+  reservedOnSiteSeats: Yup.number().min(0, "Wert muss ≥ 0 sein"),
 });
 
 const customStyles = {
@@ -89,6 +90,7 @@ function UpdateEventPage({ eventId }) {
       endDate: "",
       organizerId: "",
       timeSlots: [{ start: "", end: "" }],
+      reservedOnSiteSeats: 0,
     },
   });
 
@@ -108,7 +110,7 @@ function UpdateEventPage({ eventId }) {
     name: "timeSlots",
   });
 
-  // Function to convert date to user's timezone and format it
+  // Helper zur Umrechnung in die Nutzerzeitzone
   function formatToUserTimezone(dateStr, timezone) {
     const date = utcToZonedTime(dateStr, timezone);
     return (
@@ -118,9 +120,9 @@ function UpdateEventPage({ eventId }) {
     );
   }
 
-  const [isLoading, setIsLoading] = useState(true); // Local state to toggle loading state
-  const [loadedSession, setLoadedSession] = useState(null); // Local state to store session data
-  const [user, setUser] = useState(null); // Local state to store user data
+  const [isLoading, setIsLoading] = useState(true); // Local state für Ladeanzeige
+  const [loadedSession, setLoadedSession] = useState(null); // Session-Daten
+  const [user, setUser] = useState(null); // Aktueller User
 
   useEffect(() => {
     getSession().then((session) => {
@@ -133,27 +135,17 @@ function UpdateEventPage({ eventId }) {
     });
   }, []);
 
-  // This effect runs whenever 'event' changes. It resets form values.
+  // Beim Laden des Events die Formulardaten zurücksetzen
   useEffect(() => {
     if (event) {
       const formattedEvent = { ...event };
 
-      // Get user's timezone
       const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-      // Convert the dates to the user's timezone and format them
-      formattedEvent.startDate = formatToUserTimezone(
-        event.startDate,
-        userTimezone
-      );
-      formattedEvent.endDate = formatToUserTimezone(
-        event.endDate,
-        userTimezone
-      );
-
+      formattedEvent.startDate = formatToUserTimezone(event.startDate, userTimezone);
+      formattedEvent.endDate = formatToUserTimezone(event.endDate, userTimezone);
       formattedEvent.timeSlots = jsonToArray(event.timeSlots);
 
-      reset(formattedEvent); // Reset form with the fetched data
+      reset(formattedEvent);
     }
   }, [event, reset]);
 
@@ -172,17 +164,17 @@ function UpdateEventPage({ eventId }) {
   }
 
   const onSubmit = async (data) => {
-    data = {
+    const payload = {
       name: data.name,
       description: data.description,
       startDate: formatISO(new Date(data.startDate)),
       endDate: formatISO(new Date(data.endDate)),
       organizerId: data.organizerId,
       timeSlots: arrayToJson(data.timeSlots),
+      reservedOnSiteSeats: data.reservedOnSiteSeats, // Neues Feld in den Payload aufnehmen
     };
-    // console.log(data);
     try {
-      await updateEvent(data);
+      await updateEvent(payload);
     } catch (err) {
       console.error(err);
     }
@@ -207,7 +199,6 @@ function UpdateEventPage({ eventId }) {
     }
   }, [deleteEventLoading, deleteEventError, deleteEventData]);
 
-  // handle response from the PUT request
   useEffect(() => {
     if (!updateEventLoading && !updateEventError && updatedEventData) {
       router.push(`${env.BASE_URL}/events/${eventId}`);
@@ -301,10 +292,7 @@ function UpdateEventPage({ eventId }) {
               control={control}
               name="description"
               render={({ field }) => (
-                <textarea
-                  className={`${styles.input} ${styles.textarea}`}
-                  {...field}
-                />
+                <textarea className={`${styles.input} ${styles.textarea}`} {...field} />
               )}
             />
             {errors.description && (
@@ -318,11 +306,7 @@ function UpdateEventPage({ eventId }) {
               control={control}
               name="startDate"
               render={({ field }) => (
-                <input
-                  className={styles.input}
-                  type="datetime-local"
-                  {...field}
-                />
+                <input className={styles.input} type="datetime-local" {...field} />
               )}
             />
             {errors.startDate && (
@@ -336,15 +320,25 @@ function UpdateEventPage({ eventId }) {
               control={control}
               name="endDate"
               render={({ field }) => (
-                <input
-                  className={styles.input}
-                  type="datetime-local"
-                  {...field}
-                />
+                <input className={styles.input} type="datetime-local" {...field} />
               )}
             />
             {errors.endDate && (
               <p className={styles.error}>End Date is required</p>
+            )}
+          </label>
+
+          <label className={styles.label}>
+            Reservierte Vor-Ort Plätze:
+            <Controller
+              control={control}
+              name="reservedOnSiteSeats"
+              render={({ field }) => (
+                <input className={styles.input} type="number" {...field} />
+              )}
+            />
+            {errors.reservedOnSiteSeats && (
+              <p className={styles.error}>Please enter a valid number</p>
             )}
           </label>
 

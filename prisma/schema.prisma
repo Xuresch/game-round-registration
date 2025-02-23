@@ -1,6 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
   shadowDatabase  = false
@@ -74,42 +72,44 @@ model TempUserData {
 }
 
 model Event {
-  id          String      @id @default(uuid())
-  organizerId String
-  Organizer   User        @relation(fields: [organizerId], references: [id])
-  name        String
-  description String?     @db.LongText
-  startDate   DateTime
-  endDate     DateTime
-  timeSlots   String? // Optional field to store timeslots as JSON string
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id                   String      @id @default(uuid())
+  organizerId          String
+  Organizer            User        @relation(fields: [organizerId], references: [id])
+  name                 String
+  description          String?     @db.LongText
+  startDate            DateTime
+  endDate              DateTime
+  timeSlots            String? // Optional field to store timeslots as JSON string
+  reservedOnSiteSeats  Int         @default(0)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
   // Relations
-  GameRounds  GameRound[]
+  GameRounds           GameRound[]
 }
 
 model GameRound {
-  id                  String               @id @default(uuid())
-  eventId             String?
-  Event               Event?               @relation(fields: [eventId], references: [id])
-  gameMasterId        String
-  GameMaster          User                 @relation(fields: [gameMasterId], references: [id])
-  name                String
-  description         String?              @db.LongText
-  gameType            String // Roleplay, tabletop, boardgame
-  gameSystem          String? // Only if gameType is 'roleplay'
-  genres              String?              @db.LongText
-  recommendedAge      Int?
-  startTime           DateTime
-  endTime             DateTime
-  playerLimit         Int
-  waitingList         Boolean              @default(false)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  extraDetails        String? // A JSON field for additional info
+  id                       String               @id @default(uuid())
+  eventId                  String?
+  Event                    Event?               @relation(fields: [eventId], references: [id])
+  gameMasterId             String
+  GameMaster               User                 @relation(fields: [gameMasterId], references: [id])
+  name                     String
+  description              String?              @db.LongText
+  gameType                 String               // Roleplay, tabletop, boardgame
+  gameSystem               String?              // Only if gameType is 'roleplay'
+  genres                   String?              @db.LongText
+  recommendedAge           Int?
+  startTime                DateTime
+  endTime                  DateTime
+  playerLimit              Int
+  waitingList              Boolean              @default(false)
+  isOnSiteOnlyRegistration Boolean              @default(false)
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
+  extraDetails             String? // A JSON field for additional info
   // Relations
-  PlayerRegistrations PlayerRegistration[]
-  GameRoundGenre      GameRoundGenre[]
+  PlayerRegistrations      PlayerRegistration[]
+  GameRoundGenre           GameRoundGenre[]
 }
 
 model PlayerRegistration {

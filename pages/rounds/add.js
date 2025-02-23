@@ -49,9 +49,10 @@ const schema = Yup.object().shape({
   recommendedAge: Yup.number().positive().min(0),
   playerLimit: Yup.number().required().positive().min(0),
   waitingList: Yup.bool().required(),
+  isOnSiteOnlyRegistration: Yup.bool(),
 });
 
-function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
+function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId, reservedOnSiteSeats }) {
   const router = useRouter();
 
   const { isSessionLoading, loadedSession } = useSessionApp();
@@ -101,6 +102,7 @@ function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
         playerLimit: 0,
         waitingList: false,
         extraDetails: null,
+        isOnSiteOnlyRegistration: false,
       });
     }
 
@@ -191,6 +193,7 @@ function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
       playerLimit: +gameRound.playerLimit,
       waitingList: gameRound.waitingList,
       extraDetails: gameRound.extraDetails,
+      isOnSiteOnlyRegistration: gameRound.isOnSiteOnlyRegistration,
     };
 
     console.log(payload);
@@ -239,6 +242,11 @@ function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
       )}
       <div className={styles.header}>
         <h2 className={styles.title}>Erstelle Spielrunde</h2>
+        {eventId && (
+          <p className={styles.infoText}>
+            Hinweis: Für dieses Event sind {reservedOnSiteSeats} Plätze reserviert, die online nicht buchbar sind.
+          </p>
+        )}
       </div>
       <div className={styles.content}>
         <form className={styles.form} onSubmit={onSubmit}>
@@ -354,6 +362,18 @@ function AddGameRoundPage({ roundId, user, eventTimeSlots, genres, eventId }) {
               setGameRound({ ...gameRound, waitingList: event.target.checked })
             }
           />
+          {eventId && (<Togglebox
+            label="Nur vor Ort Anmeldung"
+            checked={gameRound.isOnSiteOnlyRegistration}
+            onChange={(event) =>
+              setGameRound({ ...gameRound, isOnSiteOnlyRegistration: event.target.checked })
+            }
+          />)}
+          {gameRound.isOnSiteOnlyRegistration && eventId && (
+            <p className={styles.infoText}>
+              Hinweis: Diese Spielrunde wird ausschließlich vor Ort registriert. Online-Anmeldungen sind deaktiviert.
+            </p>
+          )}
           <ButtonGroup
             handleCancel={handleCancel}
             saveButtonText="Runde speichern"
@@ -371,11 +391,13 @@ export async function getServerSideProps(context) {
   try {
     const sessionGet = await getSession({ req: context.req });
     const user = sessionGet?.user || null;
+    let reservedOnSiteSeats = 0;
 
     // Fetch event time slots
     let eventTimeSlots = { slot_1: { start: "", end: "" } };
     if (eventId) {
       const event = await getEvent(eventId);
+      reservedOnSiteSeats = event.reservedOnSiteSeats || 0;
       eventTimeSlots = event.timeSlots;
     }
 
@@ -390,6 +412,7 @@ export async function getServerSideProps(context) {
           eventTimeSlots,
           genres,
           eventId,
+          reservedOnSiteSeats,
         },
       };
     }
