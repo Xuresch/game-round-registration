@@ -302,11 +302,17 @@ function DeteilRoundPage({ round, gameMaster, user }) {
       countContent = (
         <>
           {countContent}{", "}
-          <span style={{ color: "#f44336" }}>
-            {round.reservedOnSiteSeats} vor Ort reserviert
+          <span style={{ color: "#d32f2f" }}>
+            {round.reservedOnSiteSeats} für vor Ort reserviert!
           </span>
         </>
       );
+    }
+    if (round.isOnSiteOnlyRegistration) {
+      countContent = (
+        <><span style={{ color: "#d32f2f" }}>
+            {round.playerLimit} für vor Ort reserviert!
+      </span></>)
     }
     return <InformationItem label="Spieler Anzahl" value={countContent} />;
   };
@@ -364,10 +370,10 @@ function DeteilRoundPage({ round, gameMaster, user }) {
           />
           {displayRegisteredPlayersCount()}
           {spotsLeft === 0 ? (
-            <div className={`${styles.badge} ${styles.badgeFull}`}>Voll</div>
+            <div className={`${styles.badge} ${styles.badgeFull}`}>Spielrunde ist Voll!</div>
           ) : spotsLeft <= availableSpots / 2 ? (
             <div className={`${styles.badge} ${styles.badgeFew}`}>
-              Nur noch wenige Plätze verfügbar
+              Nur noch wenige Plätze verfügbar!
             </div>
           ) : null}
           <InformationItem label="Beginn" value={`${displayStartDate} Uhr`} />
