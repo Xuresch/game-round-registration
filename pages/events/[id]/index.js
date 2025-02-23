@@ -78,7 +78,7 @@ function EventPage({ eventId, rounds }) {
   }
 
   if (eventError) {
-    console.log(eventError.response.data);
+    //console.log(eventError.response.data);
     const eventErrorMessage = `${eventError.message}: ${eventError.response.data.message}`;
     return <Error message={eventErrorMessage} title="event" />;
   }
@@ -110,7 +110,13 @@ function EventPage({ eventId, rounds }) {
               handleDelete={handleDelete}
             />
           )}
+
       </div>
+      {event.reservedOnSiteSeats > 0 && <div className={styles.header}>
+        <p className={styles.infoText}>
+          Hinweis: Bei jeder Spielrunde {event.reservedOnSiteSeats == 1 ? "wird" : "werden"} {event.reservedOnSiteSeats} {event.reservedOnSiteSeats == 1 ? "Platz" : "Plätze"} reserviert, {event.reservedOnSiteSeats == 1 ? "der" : "die"} online nicht buchbar {event.reservedOnSiteSeats == 1 ? "ist" : "sind"}.
+        </p>
+      </div>}
       <div className={styles.content}>
         <div className={styles.informations}>
           <p className={styles.text}>
