@@ -322,7 +322,15 @@ function DeteilRoundPage({ round, gameMaster, user }) {
   return (
     <Card>
       <div className={styles.header}>
+
         <h2 className={styles.title}>{round.name}</h2>
+        {spotsLeft === 0 ? (
+            <div className={`${styles.badge} ${styles.badgeFull}`}>Spielrunde ist Voll!</div>
+          ) : spotsLeft <= availableSpots / 2 ? (
+            <div className={`${styles.badge} ${styles.badgeFew}`}>
+              Nur noch wenige Plätze verfügbar!
+            </div>
+          ) : null}
         <InformationItem
           className={styles.gameMaster}
           label="Spielleiter"
@@ -347,6 +355,7 @@ function DeteilRoundPage({ round, gameMaster, user }) {
             />
           )}
       </div>
+
       <div className={styles.content}>
         <div className={styles.informations}>
           <InformationItem
@@ -369,13 +378,6 @@ function DeteilRoundPage({ round, gameMaster, user }) {
             value={`${round.recommendedAge} Jahre`}
           />
           {displayRegisteredPlayersCount()}
-          {spotsLeft === 0 ? (
-            <div className={`${styles.badge} ${styles.badgeFull}`}>Spielrunde ist Voll!</div>
-          ) : spotsLeft <= availableSpots / 2 ? (
-            <div className={`${styles.badge} ${styles.badgeFew}`}>
-              Nur noch wenige Plätze verfügbar!
-            </div>
-          ) : null}
           <InformationItem label="Beginn" value={`${displayStartDate} Uhr`} />
           <InformationItem label="Ende" value={`${displayEndDate} Uhr`} />
         </div>
